@@ -47,14 +47,14 @@ async def registerUser():
 
     return "User Registration Successful!",201
 
-@app.route("/login/",methods=["POST"])
-async def registerUser():
+@app.route("/login/",methods=["GET"])
+async def loginUser():
     db = await _get_db()
     data = await request.form
     dat_tup={'name':data['name'],'password':data['pass']}
 
     try:
-     await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",dat_tup,)
+     await db.execute("""select * from """,dat_tup,)
     except sqlite3.sqlite3.IntegrityError as e:
      abort(409,e)
 
