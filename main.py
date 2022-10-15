@@ -63,3 +63,21 @@ async def registerUser():
 
 
 
+
+@app.route("/games/<int:id>", methods=["GET"])
+async def all_games(id):
+    db = await _get_db()
+    game = await db.fetch_all("SELECT * FROM games WHERE user_id = :id", values={"id": id})
+    if game:
+        return dict(game)
+    else:
+        abort(404)
+
+
+@app.errorhandler(404)
+def not_found(e):
+    return {"error": "The resource could not be found"}, 404
+
+
+
+
