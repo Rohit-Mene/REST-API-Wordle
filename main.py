@@ -1,11 +1,15 @@
 import collections
 import dataclasses
+from http.client import HTTPResponse, responses
+import json
 from re import S
 import sqlite3
+from urllib import response
+from urllib.request import HTTPBasicAuthHandler
+from wsgiref import headers
 from quart import Quart,g,request,abort
 import databases
-import toml
-import textwrap
+
 from quart_schema import QuartSchema,RequestSchemaValidationError,validate_request
 app = Quart(__name__)
 QuartSchema(app)
@@ -50,15 +54,15 @@ async def registerUser():
 @app.route("/login/",methods=["GET"])
 async def loginUser():
     db = await _get_db()
-    data = await request.form
-    dat_tup={'name':data['name'],'password':data['pass']}
-
+    data =  request.authorization
+    request.headers
+    dat_tup={'name':data['username'],'password':data['password']}
     try:
-     await db.execute("""select * from """,dat_tup,)
-    except sqlite3.sqlite3.IntegrityError as e:
+     userDet = await db.fetch_one("select * from USERDATA where user_name = :user and user_pass= :pass",values={"user": data['username'], "pass": data['password']})
+    except sqlite3.sqlite3.IntegrityErrshor as e:
      abort(409,e)
+    return {"authenticated":True}
 
-    return "User Registration Successful!",201
 
 
 
