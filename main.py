@@ -2,6 +2,7 @@ import collections
 import dataclasses
 from http.client import HTTPResponse, responses
 import json
+import random
 from re import S
 import sqlite3
 from wsgiref import headers
@@ -59,8 +60,7 @@ async def loginUser() -> Response:
         return Response("Unsuccessful authentication",status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}))
     except sqlite3.sqlite3.IntegrityErrshor as e:
         abort(409,e)
-         
-    return Response(json.dumps({"authenticated":True}),status=200)
+    return Response(json.dumps({"authenticated":True,"user ID": userDet[2]}),status=200)
     
 
 
@@ -76,6 +76,23 @@ async def all_games(id):
         return dict(game)
     else:
         abort(404)
+
+@app.route("/startgame/<int:user_id>",methods=["POST"])
+async def startGame(user_id):
+    db = await _get_db()
+    file = open('correct.json')
+    data = json.load(file)
+    random.choice(data)
+    secret_word = random.choice(data)
+    dbData= {"user_id":user_id,"secret_word":secret_word}
+    try:
+     gameID = await db.execute("""
+     insert into USERGAMEDATA(user_id,secret_word) VALUES(:user_id,:secret_word)
+     """,dbData)
+    except sqlite3.sqlite3.IntegrityError as e:
+     abort(409,e)
+    res={"game_id": gameID}
+    return res,201,{"Location": f"/startgame/{gameID}"}
 
 
 @app.errorhandler(404)
