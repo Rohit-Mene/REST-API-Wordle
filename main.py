@@ -4,10 +4,8 @@ from http.client import HTTPResponse, responses
 import json
 from re import S
 import sqlite3
-from urllib import response
-from urllib.request import HTTPBasicAuthHandler
 from wsgiref import headers
-from quart import Quart,g,request,abort
+from quart import Quart,g,request,abort,Response
 import databases
 
 from quart_schema import QuartSchema,RequestSchemaValidationError,validate_request
@@ -49,19 +47,21 @@ async def registerUser():
     except sqlite3.sqlite3.IntegrityError as e:
      abort(409,e)
 
-    return "User Registration Successful!",201
+    return Response("User Registration Successful!",status=201)
 
 @app.route("/login/",methods=["GET"])
-async def loginUser():
+async def loginUser() -> Response:
     db = await _get_db()
     data =  request.authorization
-    request.headers
-    dat_tup={'name':data['username'],'password':data['password']}
     try:
      userDet = await db.fetch_one("select * from USERDATA where user_name = :user and user_pass= :pass",values={"user": data['username'], "pass": data['password']})
+     if userDet is None: 
+        return Response("Unsuccessful authentication",status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}))
     except sqlite3.sqlite3.IntegrityErrshor as e:
-     abort(409,e)
-    return {"authenticated":True}
+        abort(409,e)
+         
+    return Response(json.dumps({"authenticated":True}),status=200)
+    
 
 
 
