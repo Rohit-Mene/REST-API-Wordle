@@ -28,8 +28,6 @@ async def close_connection(exception):
     if db is not None:
          await db.disconnect()
 
-
-
 @app.route("/greet",methods=["GET"])
 async def return_Hello():
     db = await _get_db()
@@ -66,11 +64,14 @@ async def loginUser():
     else:
         return Response("Invalid Request!", status=400)
     
-
-
-
-
-
+@app.route("/gamestate/<int:game_id>", methods=["GET"])
+async def gamestate(game_id):
+    db = await _get_db()
+    gamestate = await db.fetch_all("SELECT * FROM USERGAMEDATA WHERE game_id = :game_id", values={"game_id": game_id})
+    if gamestate:
+        return list(gamestate)
+    else:
+        abort(404)
 
 @app.route("/games/<int:id>", methods=["GET"])
 async def all_games(id):
