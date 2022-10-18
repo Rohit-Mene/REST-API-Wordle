@@ -44,11 +44,12 @@ async def registerUser():
     dat_tup={'name':data['name'],'password':data['pass']}
 
     try:
-     await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",dat_tup,)
+     userId= await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",dat_tup,)
+     response = {"message":"User Registration Successful!","user_id":userId}
     except sqlite3.IntegrityError as e:
      abort(409,e)
-
-    return Response("User Registration Successful!",status=201)
+     
+    return response,201
 
 @app.route("/login/",methods=["GET"])
 async def loginUser():
@@ -166,11 +167,19 @@ async def all_games(user_id):
 async def startGame(user_id):
     db = await _get_db()
     userCheck = await db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
+    if userCheck == None:
+        res={"response":"Not Found!"}
+        return res,404
     file = open('correct.json')
     data = json.load(file)
-    random.choice(data)
     secret_word = random.choice(data)
+    dbRecWord = await db.fetch_all("select secret_word from USERGAMEDATA where user_id = :user_id",values={"user_id":user_id})
+    if dbRecWord:
+     while secret_word in dbRecWord:
+        secret_word = random.choice(data)
+
     dbData= {"user_id":user_id,"secret_word":secret_word}
+    
     try:
      gameID = await db.execute("""
      insert into USERGAMEDATA(user_id,secret_word) VALUES(:user_id,:secret_word)
