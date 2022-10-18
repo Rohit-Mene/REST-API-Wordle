@@ -67,17 +67,99 @@ async def loginUser():
         return Response("Invalid Request!", status=400)
     
 
+@dataclasses.dataclass
+class Guess:
+    game_id: int
+    guess: str
 
-
-
-
-
-@app.route("/games/<int:id>", methods=["GET"])
-async def all_games(id):
+@app.route("/guess/", methods=["POST"])
+#@validate_request(Guess)
+async def make_guess():
     db = await _get_db()
-    game = await db.fetch_all("SELECT * FROM games WHERE user_id = :id", values={"id": id})
+    data = await request.form
+    guess_made={'game_id':data['game_id']}
+    file = open('valid.json')
+    word_list = json.load(file)
+    #obtain secret word
+    try:
+        secret_word = await db.fetch_val(
+            """
+            SELECT secret_word FROM USERGAMEDATA WHERE game_id = :game_id
+            """,
+            guess_made,
+        )
+        #test if guess is correct
+        if data['guess'] == secret_word:
+            try:
+                #if correct word decrease guess remaining and change game state to false
+                await db.execute(
+                    """ 
+                        UPDATE USERGAMEDATA SET guess_cnt = guess_cnt - 1, game_sts = FALSE WHERE game_id = :game_id;
+                    """,
+                    guess_made
+                )
+            except sqlite3.IntegrityError as e:
+                abort(500, e)
+            #if correct return 
+            return Response(json.dumps({"Correct word"}),status=200)
+        #if guess is not correct but valid 
+        elif data['guess'] in word_list:
+            try:
+                #decrease guesses remaining
+                await db.execute(
+                    """ 
+                        UPDATE USERGAMEDATA SET guess_cnt = guess_cnt - 1 WHERE game_id = :game_id;
+                    """,
+                    guess_made
+                )
+            except sqlite3.IntegrityError as e:
+                abort(500, e)
+            #obtain new guess count to return
+            try:
+                guess_rem = await db.fetch_val(
+                    """
+                        SELECT guess_cnt FROM USERGAMEDATA WHERE game_id = :game_id;
+                    """,
+                    guess_made
+                )
+            except sqlite3.IntegrityError as e:
+                abort(500, e)
+            guess_word = str(data['guess'])
+            #new lists to store letter positions
+            correct_spot_list = []
+            correct_letter_list = []
+            #nested for loops to find letters that are correct but not in correct place
+            for index2 in range(len(guess_word)):
+                for index3 in range(len(secret_word)):
+                    if secret_word[index3] == guess_word[index2] and index2 == index3:
+                        correct_spot_list.append(index2)
+                    elif secret_word[index3] == guess_word[index2] and index2 != index3:
+                        correct_letter_list.append(index2)
+            if len(correct_spot_list) > 0:
+                for i in range(len(correct_letter_list)):
+                    for j in range(len(correct_spot_list)):
+                        if correct_letter_list[i] == correct_spot_list[j]:
+                            correct_letter_list.remove(correct_spot_list[j])
+            letter = [*set(correct_letter_list)]
+            spot = [*set(correct_spot_list)]           
+            #nested for loop to remove duplicate values from the two lists
+            spot_to_string = ' '.join(map(str,spot))
+            letter_to_string = ' '.join(map(str,letter))
+            return Response(json.dumps('{valid :TRUE ,  guess_remaining :' + str(guess_rem) + ', correct position :' + spot_to_string + ', correct letter incorrect spot :' + letter_to_string + '}'),status=200)
+        #if guess is not on valid list tell the user to try a different word
+        else:
+            return Response(json.dumps({"invalid guess, try again"}),status=200) 
+        
+    except sqlite3.IntegrityError as e:
+        abort(409, e)
+
+
+@app.route("/games/<int:user_id>", methods=["GET"])
+async def all_games(user_id):
+    db = await _get_db()
+    game = await db.fetch_all("select game_id from USERGAMEDATA where user_id = :user_id", values={"user_id":user_id})
     if game:
-        return list(game)
+        return list(map(dict,game))
     else:
         abort(404)
 
