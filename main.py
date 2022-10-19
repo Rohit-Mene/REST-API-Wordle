@@ -10,6 +10,7 @@ from quart import Quart,g,request,abort,Response
 import databases
 
 from quart_schema import QuartSchema,RequestSchemaValidationError,validate_request
+from sqlalchemy import false
 app = Quart(__name__)
 QuartSchema(app)
 
@@ -72,7 +73,7 @@ class Guess:
     game_id: int
     guess: str
 
-@app.route("/guess/", methods=["POST"])
+@app.route("/guess/", methods=["PUT"])
 #@validate_request(Guess)
 async def make_guess():
     db = await _get_db()
@@ -82,6 +83,24 @@ async def make_guess():
     word_list = json.load(file)
     #obtain secret word
     try:
+        gueses_left = await db.fetch_val(
+            """
+            SELECT guess_cnt FROM USERGAMEDATA WHERE game_id = :game_id
+            """,
+            guess_made,
+        )
+    except sqlite3.IntegrityError as e:
+        abort(500, e)
+    try:
+        completed_game = await db.fetch_val(
+            """
+            SELECT game_sts FROM USERGAMEDATA WHERE game_id = :game_id
+            """,
+            guess_made,
+        )
+    except sqlite3.IntegrityError as e:
+        abort(500, e)    
+    try:
         secret_word = await db.fetch_val(
             """
             SELECT secret_word FROM USERGAMEDATA WHERE game_id = :game_id
@@ -89,21 +108,30 @@ async def make_guess():
             guess_made,
         )
         #test if guess is correct
-        if data['guess'] == secret_word:
+        if data['guess'] == secret_word and completed_game == False:
             try:
                 #if correct word decrease guess remaining and change game state to false
                 await db.execute(
                     """ 
-                        UPDATE USERGAMEDATA SET guess_cnt = guess_cnt - 1, game_sts = FALSE WHERE game_id = :game_id;
+                        UPDATE USERGAMEDATA SET guess_cnt = guess_cnt - 1, game_sts = TRUE WHERE game_id = :game_id;
                     """,
                     guess_made
                 )
             except sqlite3.IntegrityError as e:
                 abort(500, e)
+            try:
+                insert_tuple = {'game_id':data['game_id'], 'guess_num' :(6 - gueses_left + 1), 'guessed_word':data['guess']}
+                await db.execute(
+                    """ 
+                        INSERT INTO guess(game_id, guess_num, guessed_word) VALUES(:game_id, :guess_num, :guessed_word)                        
+                    """,insert_tuple,
+                )
+            except sqlite3.IntegrityError as e:
+                abort(500, e)
             #if correct return 
-            return Response(json.dumps({"Correct word"}),status=200)
+            return Response(json.dumps("{correct_word: TRUE}"),status=201)
         #if guess is not correct but valid 
-        elif data['guess'] in word_list:
+        elif data['guess'] in word_list and completed_game == False and gueses_left > 1:
             try:
                 #decrease guesses remaining
                 await db.execute(
@@ -114,16 +142,16 @@ async def make_guess():
                 )
             except sqlite3.IntegrityError as e:
                 abort(500, e)
-            #obtain new guess count to return
             try:
-                guess_rem = await db.fetch_val(
-                    """
-                        SELECT guess_cnt FROM USERGAMEDATA WHERE game_id = :game_id;
-                    """,
-                    guess_made
+                insert_tuple = {'game_id':data['game_id'], 'guess_num' :6 - gueses_left, 'guessed_word':data['guess']}
+                await db.execute(
+                    """ 
+                        INSERT INTO guess(game_id, guess_num, guessed_word) VALUES(:game_id, :guess_num, :guessed_word)                        
+                    """,insert_tuple,
                 )
             except sqlite3.IntegrityError as e:
                 abort(500, e)
+            #obtain new guess count to return
             guess_word = str(data['guess'])
             #new lists to store letter positions
             correct_spot_list = []
@@ -145,10 +173,22 @@ async def make_guess():
             #nested for loop to remove duplicate values from the two lists
             spot_to_string = ' '.join(map(str,spot))
             letter_to_string = ' '.join(map(str,letter))
-            return Response(json.dumps('{valid :TRUE ,  guess_remaining :' + str(guess_rem) + ', correct position :' + spot_to_string + ', correct letter incorrect spot :' + letter_to_string + '}'),status=200)
+            return Response(json.dumps('{valid :TRUE ,  guess_remaining :' + str(gueses_left - 1) + ', correct position :' + spot_to_string + ', correct letter incorrect spot :' + letter_to_string + '}'),status=201)
         #if guess is not on valid list tell the user to try a different word
+        elif gueses_left <= 1:
+            try:
+                #no guesses left 
+                await db.execute(
+                    """ 
+                        UPDATE USERGAMEDATA SET game_sts = TRUE WHERE game_id = :game_id;
+                    """,
+                    guess_made
+                )
+            except sqlite3.IntegrityError as e:
+                abort(500, e)
+            return Response(json.dumps("{guess_rem : 0, game_sts: TRUE}"),status=201)
         else:
-            return Response(json.dumps({"invalid guess, try again"}),status=200) 
+            return Response(json.dumps("{valid: FALSE, guess_rem :"+ str(gueses_left) + "}"),status=204) 
         
     except sqlite3.IntegrityError as e:
         abort(409, e)
@@ -157,9 +197,9 @@ async def make_guess():
 @app.route("/games/<int:user_id>", methods=["GET"])
 async def all_games(user_id):
     db = await _get_db()
-    game = await db.fetch_all("select game_id from USERGAMEDATA where user_id = :user_id", values={"user_id":user_id})
+    game = await db.fetch_all("select game_id from USERGAMEDATA where user_id = :user_id AND game_sts = FALSE", values={"user_id":user_id})
     if game:
-        return list(map(dict,game))
+        return Response(json.dumps(list(map(dict,game))), status=201)
     else:
         abort(404)
 
