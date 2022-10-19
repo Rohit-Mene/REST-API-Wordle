@@ -29,8 +29,6 @@ async def close_connection(exception):
     if db is not None:
          await db.disconnect()
 
-
-
 @app.route("/greet",methods=["GET"])
 async def return_Hello():
     db = await _get_db()
@@ -67,6 +65,16 @@ async def loginUser():
     else:
         return Response("Invalid Request!", status=400)
     
+@app.route("/gamestate/<int:game_id>", methods=["GET"])
+async def gamestate(game_id):
+    db = await _get_db()
+    gamestate = await db.fetch_all("select * from USERGAMEDATA where game_id = :game_id", values={"game_id": game_id})
+    if gamestate:
+        guesses = await db.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
+        gameinfo = gamestate + guesses
+        return list(map(dict,gameinfo))
+    else:
+        abort(404)
 
 @dataclasses.dataclass
 class Guess:
