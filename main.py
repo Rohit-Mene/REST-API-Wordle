@@ -67,9 +67,11 @@ async def loginUser():
 @app.route("/gamestate/<int:game_id>", methods=["GET"])
 async def gamestate(game_id):
     db = await _get_db()
-    gamestate = await db.fetch_all("SELECT * FROM USERGAMEDATA WHERE game_id = :game_id", values={"game_id": game_id})
+    gamestate = await db.fetch_all("select * from USERGAMEDATA where game_id = :game_id", values={"game_id": game_id})
     if gamestate:
-        return list(gamestate)
+        guesses = await db.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
+        gameinfo = gamestate + guesses
+        return list(map(dict,gameinfo))
     else:
         abort(404)
 
