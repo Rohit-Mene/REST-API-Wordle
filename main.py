@@ -1,4 +1,4 @@
-import collections
+
 import dataclasses
 from http.client import HTTPResponse, responses
 import json
@@ -9,7 +9,7 @@ from wsgiref import headers
 from quart import Quart,g,request,abort,Response
 import databases
 
-from quart_schema import QuartSchema,RequestSchemaValidationError,validate_request
+from quart_schema import QuartSchema,validate_request
 from sqlalchemy import false
 app = Quart(__name__)
 QuartSchema(app)
@@ -18,7 +18,7 @@ QuartSchema(app)
 async def _get_db():
     db = getattr(g, "_sqlite_db", None)
     if db is None:
-        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:project1')
+        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/project1.db')
         await db.connect()
     return db
 
@@ -61,7 +61,7 @@ async def loginUser():
          return Response("Unsuccessful authentication",status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}))
      except sqlite3.IntegrityError as e:
         abort(409,e)
-     return Response(json.dumps({"authenticated":True,"user ID": userDet[2]}),status=200)
+     return Response(json.dumps({"authenticated":True}),status=200)
     else:
         return Response("Invalid Request!", status=400)
     
