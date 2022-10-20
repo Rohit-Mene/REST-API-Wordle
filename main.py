@@ -218,15 +218,12 @@ async def startGame(user_id):
     if userCheck == None:
         res={"response":"Not Found!"}
         return res,404
-    file = open('correct.json')
-    data = json.load(file)
-    secret_word = random.choice(data)
-    dbRecWord = await db.fetch_all("select secret_word from USERGAMEDATA where user_id = :user_id",values={"user_id":user_id})
-    if dbRecWord:
-     while secret_word in dbRecWord:
-        secret_word = random.choice(data)
 
-    dbData= {"user_id":user_id,"secret_word":secret_word}
+    secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+
+    dbData={"err":"No Data"}
+    if secret_word:
+     dbData= {"user_id":user_id,"secret_word":secret_word[0]}
     
     try:
      gameID = await db.execute("""
