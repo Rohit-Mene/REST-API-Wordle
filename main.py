@@ -69,10 +69,23 @@ async def loginUser():
 async def gamestate(game_id):
     db = await _get_db()
     gamestate = await db.fetch_all("select * from USERGAMEDATA where game_id = :game_id", values={"game_id": game_id})
+    guesses = await db.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
     if gamestate:
-        guesses = await db.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
-        gameinfo = gamestate + guesses
-        return list(map(dict,gameinfo))
+        gameinfo = list(map(dict,gamestate))
+        status = gameinfo[0]['game_sts']
+        # for now assuming 0 is in progress, 1 is a win, 2 is a loss
+        if status is 0:
+            # return the response for each previous valid but incorrect guess
+            # convert output to json
+            return "Active"
+        else:
+            if status is 1:
+                outcome = "win"
+            else:
+                outcome = "loss"
+            guesscount = gameinfo[0]['guess_cnt']
+            winfo = json.dumps({"outcome": outcome, "guesses": guesscount})
+            return winfo
     else:
         abort(404)
 
