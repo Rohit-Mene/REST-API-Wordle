@@ -77,15 +77,42 @@ async def gamestate(game_id):
         if status is 0:
             # return the response for each previous valid but incorrect guess
             # convert output to json
-            return "Active"
+            guessList = list(map(dict,guesses))
+            secret = gameinfo[0]['secret_word']
+            correct_spot_list = []
+            correct_letter_list = []
+            guessInfo = []
+            for guess in guessList:
+                correct_spot_list = []
+                correct_letter_list = []
+                guessed_word = guess['guessed_word']
+                for i in range(0, len(guessed_word)):
+                    if guessed_word[i] in secret:
+                        if guessed_word[i] == secret[i]:
+                            correct_spot_list.append(i)
+                        else:
+                            correct_letter_list.append(i)
+                correct = 0
+                if guess == secret:
+                    correct = 1
+                guessDict = {
+                    'guessed_word': guessed_word,
+                    'valid': 1,
+                    'correct_guess': correct,
+                    'guesses_remaining': 5 - guess['guess_num'],
+                    'correct_letters': correct_letter_list,
+                    'correct_index': correct_spot_list
+                }
+                guessInfo.append(guessDict)
+            liveGame = {
+                'game_id': game_id,
+                'user': gameinfo[0]['user_id'],
+                'guesses_remaining': gameinfo[0]['guess_cnt'],
+                'guesses': guessInfo
+            }
+            return liveGame
         else:
-            if status is 1:
-                outcome = "win"
-            else:
-                outcome = "loss"
-            guesscount = gameinfo[0]['guess_cnt']
-            winfo = json.dumps({"outcome": outcome, "guesses": guesscount})
-            return winfo
+            return
     else:
         abort(404)
 
