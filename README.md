@@ -1,11 +1,22 @@
 # cpsc449-project-wordle
 
+# DB Script Excecution Steps -
+   1) GO to path /Project1/bin
+   2) Run command sh init .sh
+   3) Go to path /Project1/var
+   4) Run command  sqlite3 project1.db
+   5) Run command .tables  to check if tables are created
 
-# http GET http://127.0.0.1:5000/games/<:id> returns dictionary of all active games by a single user with id <:id>
+-----------------------
+API DOCUMENTATION-
+1) User registration:
+   #http POST http://localhost:5000/registeruser/ user:='{"name":"rohit","pass":"mene"}'
 
-#http --form POST http://localhost:5000/registeruser/ name="rohit" pass="mene"
+2) User Login -
+  #http --form --auth rohit:mene --auth-type basic GET http://localhost:5000/login/
 
-#http --form --auth rohit:mene --auth-type basic GET http://localhost:5000/login/
+#http GET http://127.0.0.1:5000/games/<:id> returns dictionary of all active games by a single user with id <:id>
+
 
 http --form PUT http://127.0.0.1:5000/guess/ game_id=8 guess="kneed"
 If the word is the correct word it returns a JSON object in the form of,        

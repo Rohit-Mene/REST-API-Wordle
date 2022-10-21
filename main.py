@@ -1,4 +1,4 @@
-import collections
+
 import dataclasses
 from http.client import HTTPResponse, responses
 import json
@@ -9,7 +9,7 @@ from wsgiref import headers
 from quart import Quart,g,request,abort,Response
 import databases
 
-from quart_schema import QuartSchema,RequestSchemaValidationError,validate_request
+from quart_schema import QuartSchema,validate_request
 from sqlalchemy import false
 app = Quart(__name__)
 QuartSchema(app)
@@ -18,7 +18,7 @@ QuartSchema(app)
 async def _get_db():
     db = getattr(g, "_sqlite_db", None)
     if db is None:
-        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:project1')
+        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/project1.db')
         await db.connect()
     return db
 
@@ -28,8 +28,6 @@ async def close_connection(exception):
     db = getattr(g, "_sqlite_db", None)
     if db is not None:
          await db.disconnect()
-
-
 
 @app.route("/greet",methods=["GET"])
 async def return_Hello():
@@ -41,8 +39,8 @@ async def return_Hello():
 @app.route("/registeruser/",methods=["POST"])
 async def registerUser():
     db = await _get_db()
-    data = await request.form
-    dat_tup={'name':data['name'],'password':data['pass']}
+    userDet = await request.get_json()
+    dat_tup={'name': userDet.get('user').get('name'),'password': userDet.get('user').get('pass')}
 
     try:
      userId= await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",dat_tup,)
@@ -63,10 +61,20 @@ async def loginUser():
          return Response("Unsuccessful authentication",status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}))
      except sqlite3.IntegrityError as e:
         abort(409,e)
-     return Response(json.dumps({"authenticated":True,"user ID": userDet[2]}),status=200)
+     return Response(json.dumps({"authenticated":True}),status=200)
     else:
         return Response("Invalid Request!", status=400)
     
+@app.route("/gamestate/<int:game_id>", methods=["GET"])
+async def gamestate(game_id):
+    db = await _get_db()
+    gamestate = await db.fetch_all("select * from USERGAMEDATA where game_id = :game_id", values={"game_id": game_id})
+    if gamestate:
+        guesses = await db.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
+        gameinfo = gamestate + guesses
+        return list(map(dict,gameinfo))
+    else:
+        abort(404)
 
 @dataclasses.dataclass
 class Guess:
@@ -211,15 +219,12 @@ async def startGame(user_id):
     if userCheck == None:
         res={"response":"Not Found!"}
         return res,404
-    file = open('correct.json')
-    data = json.load(file)
-    secret_word = random.choice(data)
-    dbRecWord = await db.fetch_all("select secret_word from USERGAMEDATA where user_id = :user_id",values={"user_id":user_id})
-    if dbRecWord:
-     while secret_word in dbRecWord:
-        secret_word = random.choice(data)
 
-    dbData= {"user_id":user_id,"secret_word":secret_word}
+    secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+
+    dbData={"err":"No Data"}
+    if secret_word:
+     dbData= {"user_id":user_id,"secret_word":secret_word[0]}
     
     try:
      gameID = await db.execute("""
