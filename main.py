@@ -39,8 +39,8 @@ async def return_Hello():
 @app.route("/registeruser/",methods=["POST"])
 async def registerUser():
     db = await _get_db()
-    data = await request.form
-    dat_tup={'name':data['name'],'password':data['pass']}
+    userDet = await request.get_json()
+    dat_tup={'name': userDet.get('user').get('name'),'password': userDet.get('user').get('pass')}
 
     try:
      userId= await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",dat_tup,)
@@ -218,15 +218,12 @@ async def startGame(user_id):
     if userCheck == None:
         res={"response":"Not Found!"}
         return res,404
-    file = open('correct.json')
-    data = json.load(file)
-    secret_word = random.choice(data)
-    dbRecWord = await db.fetch_all("select secret_word from USERGAMEDATA where user_id = :user_id",values={"user_id":user_id})
-    if dbRecWord:
-     while secret_word in dbRecWord:
-        secret_word = random.choice(data)
 
-    dbData= {"user_id":user_id,"secret_word":secret_word}
+    secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+
+    dbData={"err":"No Data"}
+    if secret_word:
+     dbData= {"user_id":user_id,"secret_word":secret_word[0]}
     
     try:
      gameID = await db.execute("""
