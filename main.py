@@ -65,9 +65,11 @@ async def loginUser():
     else:
         return Response("Invalid Request!", status=400)
     
-@app.route("/gamestate/<int:game_id>", methods=["GET"])
-async def gamestate(game_id):
+@app.route("/gamestate/", methods=["GET"])
+async def gamestate():
     db = await _get_db()
+    userDet = await request.get_json()
+    game_id = userDet.get('game').get('game_id')
     gamestate = await db.fetch_all("select * from USERGAMEDATA where game_id = :game_id", values={"game_id": game_id})
     guesses = await db.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
     if gamestate:

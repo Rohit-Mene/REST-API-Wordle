@@ -20,7 +20,7 @@ API DOCUMENTATION-
 
 #http GET http://127.0.0.1:5000/games/<:id> returns dictionary of all active games by a single user with id <:id>
 
-#http GET http://localhost:5000/gamestate/<game_id>
+#http GET http://localhost:5000/gamestate/ game:='{"game_id":1}'
 
 http --form PUT http://127.0.0.1:5000/guess/ game_id=8 guess="kneed"
 If the word is the correct word it returns a JSON object in the form of,        
