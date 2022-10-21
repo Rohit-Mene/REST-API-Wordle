@@ -6,7 +6,7 @@ import sqlite3
 from quart import Quart,g,request,abort,Response
 import databases
 
-from quart_schema import QuartSchema
+from quart_schema import QuartSchema,validate_request
 from sqlalchemy import false
 app = Quart(__name__)
 QuartSchema(app)
@@ -147,18 +147,16 @@ async def make_guess():
     db = await _get_db()
     data = await request.form
     guess_made={'game_id':data['game_id']}
-    app.logger.debug(guess_made)
     file = open('valid.json')
     word_list = json.load(file)
     #obtain secret word
     try:
-        gueses_left = await db.fetch_one(
-           "SELECT guess_cnt FROM USERGAMEDATA WHERE game_id = :game_id",
-            values ={"game_id":int(data['game_id'])},
+        gueses_left = await db.fetch_val(
+            """
+            SELECT guess_cnt FROM USERGAMEDATA WHERE game_id = :game_id
+            """,
+            guess_made,
         )
-        if gueses_left:
-         app.logger.debug("hey")   
-         app.logger.debug(gueses_left[0])
     except sqlite3.IntegrityError as e:
         abort(500, e)
     try:
