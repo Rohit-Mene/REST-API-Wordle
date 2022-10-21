@@ -74,11 +74,12 @@ class Guess:
     guess: str
 
 @app.route("/guess/", methods=["PUT"])
-#@validate_request(Guess)
-async def make_guess():
+@validate_request(Guess)
+async def make_guess(data):
     db = await _get_db()
-    data = await request.form
-    guess_made={'game_id':data['game_id']}
+    #data = await request.form
+    #guess_made={'game_id':data['game_id'], 'guess' :data['guess']}
+    guess_made = dataclasses.asdict(data)
     file = open('valid.json')
     word_list = json.load(file)
     #obtain secret word
@@ -108,7 +109,7 @@ async def make_guess():
             guess_made,
         )
         #test if guess is correct
-        if data['guess'] == secret_word and completed_game == False:
+        if data[':guess'] == secret_word and completed_game == False:
             try:
                 #if correct word decrease guess remaining and change game state to false
                 await db.execute(
@@ -131,7 +132,7 @@ async def make_guess():
             #if correct return 
             return Response(json.dumps("{correct_word: TRUE}"),status=201)
         #if guess is not correct but valid 
-        elif data['guess'] in word_list and completed_game == False and gueses_left > 1:
+        elif data[':guess'] in word_list and completed_game == False and gueses_left > 1:
             try:
                 #decrease guesses remaining
                 await db.execute(
@@ -152,7 +153,7 @@ async def make_guess():
             except sqlite3.IntegrityError as e:
                 abort(500, e)
             #obtain new guess count to return
-            guess_word = str(data['guess'])
+            guess_word = str(data[':guess'])
             #new lists to store letter positions
             correct_spot_list = []
             correct_letter_list = []
