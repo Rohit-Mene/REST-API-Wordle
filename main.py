@@ -39,8 +39,8 @@ async def return_Hello():
 @app.route("/registeruser/",methods=["POST"])
 async def registerUser():
     db = await _get_db()
-    data = await request.form
-    dat_tup={'name':data['name'],'password':data['pass']}
+    userDet = await request.get_json()
+    dat_tup={'name': userDet.get('user').get('name'),'password': userDet.get('user').get('pass')}
 
     try:
      userId= await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",dat_tup,)
