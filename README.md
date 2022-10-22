@@ -38,8 +38,6 @@ API DOCUMENTATION-
 5) Get the state of a game
   http GET http://localhost:5000/gamestate/ game:='{"game_id":<game_id>}'
   
-  where the <game_id> parameter is an int corresponding to the game_id of an active or completed game
-  
     5a) If the given game_id corresponds to a completed game, it returns a JSON object in the form of:
     
     Sample Output:
