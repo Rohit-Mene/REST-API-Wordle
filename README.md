@@ -52,10 +52,10 @@ API DOCUMENTATION-
               "game_id": 1
           }
 
-4)Retrieve a list of all active games for a user
-  http GET http://127.0.0.1:5000/games/<:id> 
-  
-  Returns dictionary of all active games by a single user with id <:id>
+4)Retrieve a list of all active games for a plater
+  #http GET http://127.0.0.1:5000/games/ user:='{"user_id":#}'
+
+  Returns dictionary of all active games by a single user with id #
     Sample Output:
         {
             "game_id": 4
@@ -66,6 +66,9 @@ API DOCUMENTATION-
         {
             "game_id": 13
         }
+            Output Format.
+                game_id represents a game that is active for the player in question.
+
 
 5) Get the state of a game
   http GET http://localhost:5000/gamestate/ game:='{"game_id":<game_id>}'
