@@ -25,7 +25,7 @@ API DOCUMENTATION-
         }
 
 2) User Login:
-  http --form --auth <name>:<pass> --auth-type basic GET http://localhost:5000/login/
+  http --form --auth name:pass --auth-type basic GET http://localhost:5000/login/
 
   where <name> is the user name of the user trying to login and <pass > is the password of the user trying to login
 
