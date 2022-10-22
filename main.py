@@ -161,7 +161,7 @@ async def gamestate():
     else:
         abort(404)
 
-
+#api for making a guess to an active game
 @app.route("/guess/", methods=["PUT"])
 async def make_guess():
     #contact db
@@ -291,7 +291,7 @@ async def make_guess():
             letter_to_string = ' '.join(map(str,letter))
             return {"valid":"TRUE" ,  "guess_remaining ": str(gueses_left - 1), "correct_position" : spot_to_string , "correct_letter_incorrect_spot ": letter_to_string},201
         #if no guesses remian in game
-        elif gueses_left <= 1:
+        elif valid_check and completed_game == False and gueses_left <= 1:
             try:
                 #change game state to TRUE meaning game is over 
                 await db.execute(
@@ -320,12 +320,19 @@ async def make_guess():
     except sqlite3.IntegrityError as e:
         abort(409, e)
 
-@app.route("/games/<int:user_id>", methods=["GET"])
-async def all_games(user_id):
+@app.route("/games/", methods=["GET"])
+async def all_games():
     #connect to db
     db = await _get_db()
+    userDet = await request.get_json()
+    user_id = {"user_id": userDet.get('user').get('user_id')}
     #select all active games for a single user
-    game = await db.fetch_all("select game_id from USERGAMEDATA where user_id = :user_id AND game_sts = FALSE", values={"user_id":user_id})
+    game = await db.fetch_all(
+        """
+            select game_id from USERGAMEDATA where user_id = :user_id AND game_sts = FALSE
+        """, user_id, 
+    
+    )
     if game:
         return list(map(dict,game)),201
     else:
