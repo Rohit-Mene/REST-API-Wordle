@@ -106,7 +106,7 @@ async def gamestate():
         guessList = list(map(dict,guesses))
 
         # if the game is still active, retrieve list of guesses
-        if status is 0:
+        if status == 0:
             secret = gameinfo[0]['secret_word']
             guessInfo = []
             
