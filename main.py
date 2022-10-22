@@ -293,7 +293,16 @@ async def make_guess():
                 )
             except sqlite3.IntegrityError as e:
                 abort(500, e)
-            #return statement letting player know they are out of guesses    
+            #return statement letting player know they are out of guesses
+            try:
+                insert_tuple = {'game_id':data.get('guess_to_make').get('game_id'), 'guess_num' :6 - gueses_left, 'guessed_word':data.get('guess_to_make').get('guess')}
+                await db.execute(
+                    """ 
+                        INSERT INTO guess(game_id, guess_num, guessed_word) VALUES(:game_id, :guess_num, :guessed_word)                        
+                    """,insert_tuple,
+                )
+            except sqlite3.IntegrityError as e:
+                abort(500, e)    
             return {"guess_rem" : "0","game_sts": "TRUE"},201
         #if the word guessed is invalid let the user know it is not valid and they must guess again
         elif invalid_check:
