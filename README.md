@@ -4,11 +4,12 @@ Sean McCarthy
 # cpsc449-project-wordle
 
 # DB Script Excecution Steps -
-   1) GO to path /Project1/bin
+   1) Run the command  cd bin
    2) Run command sh init.sh
-   3) Go to path /Project1/var
-   4) Run command  sqlite3 project1.db
-   5) Run command .tables  to check if tables are created
+   3) Run command cd ..
+   4) Go to path   cd var
+   5) Run command  sqlite3 project1.db
+   6) Run command .tables  to check if tables are created
 
 -----------------------
 API DOCUMENTATION-
