@@ -1,8 +1,11 @@
+Gage Giovanni
+Rohit Mene
+Sean McCarthy
 # cpsc449-project-wordle
 
 # DB Script Excecution Steps -
    1) GO to path /Project1/bin
-   2) Run command sh init .sh
+   2) Run command sh init.sh
    3) Go to path /Project1/var
    4) Run command  sqlite3 project1.db
    5) Run command .tables  to check if tables are created
@@ -10,16 +13,47 @@
 -----------------------
 API DOCUMENTATION-
 1) User registration:
-  #http POST http://localhost:5000/registeruser/ user:='{"name":"rohit","pass":"mene"}'
+  http POST http://localhost:5000/registeruser/ user:='{"name":"<name>","pass":"<pass>"}'
 
-2) User Login -
-  #http --form --auth rohit:mene --auth-type basic GET http://localhost:5000/login/
+  where <name> is the username of the new user and <pass> is the password of the new user
 
+    Sample Output:
+        {
+            "message": "User Registration Successful!",
+            "user_id": 1
+        }
+
+2) User Login:
+  http --form --auth <name>:<pass> --auth-type basic GET http://localhost:5000/login/
+
+  where <name> is the user name of the user trying to login and <pass > is the password of the user trying to login
+
+    2a) If given a valid username and password for an existing password:
+
+        Sample Output:
+            {
+                "authenticated": true
+            }
+
+    2b) If given an invalid username or password:
+
+        Sample Output:
+            {
+                "response": "Unsuccessful authentication"
+            }
+        
 3) Start a game:
-  #http POST http://localhost:5000/startgame/<user_id>
+  http POST http://localhost:5000/startgame/ user:='{"user_id":<user_id>}'
 
-4)Retrieve a list of all active games for a plater
-  #http GET http://127.0.0.1:5000/games/<:id> 
+  where <user_id> is the id number of the user starting the game
+
+      Sample Output:
+          {
+              "game_id": 1
+          }
+
+4)Retrieve a list of all active games for a user
+  http GET http://127.0.0.1:5000/games/<:id> 
   
   Returns dictionary of all active games by a single user with id <:id>
     Sample Output:
@@ -32,11 +66,11 @@ API DOCUMENTATION-
         {
             "game_id": 13
         }
-            Output Format.
-                game_id represents a game that is active for the player in question.
 
 5) Get the state of a game
   http GET http://localhost:5000/gamestate/ game:='{"game_id":<game_id>}'
+
+  where <game_id> is the id number of an existing game
   
     5a) If the given game_id corresponds to a completed game, it returns a JSON object in the form of:
     
@@ -85,8 +119,9 @@ API DOCUMENTATION-
 
 
 6) Make a guess in an active game:
-  http PUT http://127.0.0.1:5000/guess/ guess_to_make:='{"game_id":"#","guess":"     "}'
-  Use the JSON format after URL to enter input data for this api. Enter the game ID where # is and enter guess word in blank string.
+  http PUT http://127.0.0.1:5000/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
+
+  Use the JSON format after URL to enter input data for this api. Enter the game ID where <game_id> is and enter guess word where <guess> is.
     
     6a) If the word is the correct word it returns a JSON object in the form of,        
 
