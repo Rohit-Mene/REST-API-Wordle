@@ -54,7 +54,7 @@ API DOCUMENTATION-
           }
 
 4)Retrieve a list of all active games for a player
-  http GET http://127.0.0.1:5000/games/ user:='{"user_id":<user_id>}'
+  http GET http://localhost:5000/games/ user:='{"user_id":<user_id>}'
 
   where <user_id> is the id of a registered user
 
@@ -122,7 +122,7 @@ API DOCUMENTATION-
 
 
 6) Make a guess in an active game:
-  http PUT http://127.0.0.1:5000/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
+  http PUT http://localhost:5000/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
 
   Use the JSON format after URL to enter input data for this api. Enter the game ID where <game_id> is and enter guess word where <guess> is.
     
