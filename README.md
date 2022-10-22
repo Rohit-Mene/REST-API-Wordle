@@ -123,7 +123,7 @@ API DOCUMENTATION-
 
 6) Make a guess in an active game:
   http PUT http://localhost:5000/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
-
+  Note: The response for positions is 0th Index based.
   Use the JSON format after URL to enter input data for this api. Enter the game ID where <game_id> is and enter guess word where <guess> is.
     
     6a) If the word is the correct word it returns a JSON object in the form of,        
