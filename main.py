@@ -56,17 +56,19 @@ async def loginUser():
         #Find the User details
       userDet = await db.fetch_one("select * from USERDATA where user_name = :user and user_pass= :pass",values={"user": data['username'], "pass": data['password']})
       if (userDet is None): 
-         return Response(json.dumps({"response":"Unsuccessful authentication"}),status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}))
+         return Response(json.dumps({"response":"Unsuccessful authentication"}),status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}), content_type="application/json")
      except sqlite3.IntegrityError as e:
         abort(409,e)
-     return Response(json.dumps({"authenticated":True}),status=200)
+     return Response(json.dumps({"authenticated":True}),status=200, content_type="application/json")
     else:
-        return Response(json.dumps({"response":"Invalid Request!"}), status=400)
+        return Response(json.dumps({"response":"Invalid Request!"}), status=400, content_type="application/json")
 
 #API for starting a new game
-@app.route("/startgame/<int:user_id>",methods=["POST"])
-async def startGame(user_id):
+@app.route("/startgame/",methods=["POST"])
+async def startGame():
     db = await _get_db()
+    userDet = await request.get_json()
+    user_id = userDet.get('user').get('user_id')
     userCheck = await db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
     if userCheck == None:
         res={"response":"User not found!"}
@@ -86,12 +88,15 @@ async def startGame(user_id):
      res={"game_id": gameID}
      return res,201,{"Location": f"/startgame/{gameID}"}
 
-    
+# API for getting the state of an existing game
 @app.route("/gamestate/", methods=["GET"])
 async def gamestate():
+    # contact db
     db = await _get_db()
+    # retrieve input JSON
     userDet = await request.get_json()
     game_id = userDet.get('game').get('game_id')
+    # retrieve db game date and guess data for the given game_id
     gamestate = await db.fetch_all("select * from USERGAMEDATA where game_id = :game_id", values={"game_id": game_id})
     guesses = await db.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
 
@@ -100,10 +105,12 @@ async def gamestate():
         status = gameinfo[0]['game_sts']
         guessList = list(map(dict,guesses))
 
+        # if the game is still active, retrieve list of guesses
         if status is 0:
             secret = gameinfo[0]['secret_word']
             guessInfo = []
-
+            
+            # retrieve correctness of each guess
             for guess in guessList:
                 correct_spot_list = ""
                 correct_letter_list = ""
@@ -131,6 +138,7 @@ async def gamestate():
 
                 guessInfo.append(guessDict)
 
+            # return game info and guess data
             liveGame = {
                 'game_id': game_id,
                 'user': gameinfo[0]['user_id'],
@@ -140,11 +148,13 @@ async def gamestate():
 
             return liveGame
 
+        # if the game is no longer active, return the victory status and guesses used
         else:
             guessesUsed = len(guesses)
             finalGuess = guessList[guessesUsed - 1]['guessed_word']
             secret = gameinfo[0]['secret_word']
 
+            # determine the outcome of the game and set victory accordingly
             victory = True if finalGuess == secret else False
 
             return {"victory": victory, "guesses_used": guessesUsed}
