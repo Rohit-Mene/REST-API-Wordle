@@ -1,18 +1,14 @@
-
 import dataclasses
 import json
-import logging
-import random
 import sqlite3
 from quart import Quart,g,request,abort,Response
 import databases
+from quart_schema import QuartSchema
 
-from quart_schema import QuartSchema,validate_request
-from sqlalchemy import false
 app = Quart(__name__)
 QuartSchema(app)
 
-
+#DB Connection
 async def _get_db():
     db = getattr(g, "_sqlite_db", None)
     if db is None:
@@ -20,7 +16,7 @@ async def _get_db():
         await db.connect()
     return db
 
-
+#DB Disconnect 
 @app.teardown_appcontext
 async def close_connection(exception):
     db = getattr(g, "_sqlite_db", None)
@@ -40,7 +36,9 @@ async def registerUser():
     userDetMap={'name': userDet.get('user').get('name'),'password': userDet.get('user').get('pass')}
 
     try:
+        #Passes the username and password given by user 
      userId= await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",userDetMap,)
+     #Takes in userID received from the user to generate a response
      response = {"message":"User Registration Successful!","user_id":userId}
 
     except sqlite3.IntegrityError as e:
@@ -55,6 +53,7 @@ async def loginUser():
     data =  request.authorization
     if data:
      try:
+        #Find the User details
       userDet = await db.fetch_one("select * from USERDATA where user_name = :user and user_pass= :pass",values={"user": data['username'], "pass": data['password']})
       if (userDet is None): 
          return Response(json.dumps({"response":"Unsuccessful authentication"}),status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}), content_type="application/json")
@@ -162,7 +161,7 @@ async def gamestate():
     else:
         abort(404)
 
-
+#api for making a guess to an active game
 @app.route("/guess/", methods=["PUT"])
 async def make_guess():
     #contact db
@@ -292,7 +291,7 @@ async def make_guess():
             letter_to_string = ' '.join(map(str,letter))
             return {"valid":"TRUE" ,  "guess_remaining ": str(gueses_left - 1), "correct_position" : spot_to_string , "correct_letter_incorrect_spot ": letter_to_string},201
         #if no guesses remian in game
-        elif gueses_left <= 1:
+        elif valid_check and completed_game == False and gueses_left <= 1:
             try:
                 #change game state to TRUE meaning game is over 
                 await db.execute(
@@ -303,7 +302,16 @@ async def make_guess():
                 )
             except sqlite3.IntegrityError as e:
                 abort(500, e)
-            #return statement letting player know they are out of guesses    
+            #return statement letting player know they are out of guesses
+            try:
+                insert_tuple = {'game_id':data.get('guess_to_make').get('game_id'), 'guess_num' :6 - gueses_left, 'guessed_word':data.get('guess_to_make').get('guess')}
+                await db.execute(
+                    """ 
+                        INSERT INTO guess(game_id, guess_num, guessed_word) VALUES(:game_id, :guess_num, :guessed_word)                        
+                    """,insert_tuple,
+                )
+            except sqlite3.IntegrityError as e:
+                abort(500, e)    
             return {"guess_rem" : "0","game_sts": "TRUE"},201
         #if the word guessed is invalid let the user know it is not valid and they must guess again
         elif invalid_check:
@@ -312,12 +320,19 @@ async def make_guess():
     except sqlite3.IntegrityError as e:
         abort(409, e)
 
-@app.route("/games/<int:user_id>", methods=["GET"])
-async def all_games(user_id):
+@app.route("/games/", methods=["GET"])
+async def all_games():
     #connect to db
     db = await _get_db()
+    userDet = await request.get_json()
+    user_id = {"user_id": userDet.get('user').get('user_id')}
     #select all active games for a single user
-    game = await db.fetch_all("select game_id from USERGAMEDATA where user_id = :user_id AND game_sts = FALSE", values={"user_id":user_id})
+    game = await db.fetch_all(
+        """
+            select game_id from USERGAMEDATA where user_id = :user_id AND game_sts = FALSE
+        """, user_id, 
+    
+    )
     if game:
         return list(map(dict,game)),201
     else:
