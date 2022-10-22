@@ -124,12 +124,11 @@ class Guess:
     guess: str
 
 @app.route("/guess/", methods=["PUT"])
-@validate_request(Guess)
-async def make_guess(data):
+#@validate_request(Guess)
+async def make_guess():
     db = await _get_db()
-    #data = await request.form
-    #guess_made={'game_id':data['game_id'], 'guess' :data['guess']}
-    guess_made = dataclasses.asdict(data)
+    data = await request.get_json()
+    guess_made={'game_id': data.get('guess_to_make').get('game_id'),'guess': data.get('guess_to_make').get('guess')}
     file = open('valid.json')
     word_list = json.load(file)
     #obtain secret word
