@@ -11,7 +11,7 @@ Sean McCarthy
    5) Run command  sqlite3 project1.db
    6) Run command .tables  to check if tables are created
 
-#Start the Server 
+# Start the Server 
    foreman start
 
 -----------------------
