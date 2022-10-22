@@ -35,7 +35,55 @@ API DOCUMENTATION-
             Output Format.
                 game_id represents a game that is active for the player in question.
 
-5) #http GET http://localhost:5000/gamestate/ game:='{"game_id":1}'
+5) Get the state of a game
+  http GET http://localhost:5000/gamestate/ game:='{"game_id":<game_id>}'
+  where the <game_id> parameter is an int corresponding to the game_id of an active or completed game
+  
+    5a) If the given game_id corresponds to a completed game, it returns a JSON object in the form of:
+    
+    Sample Output:
+
+        {
+            "guesses_used": 5,
+            "victory": false
+        }
+
+        Output Format:
+            guesses_used {int}: number of guesses made before the given game ended
+            victory {boolean}: represents the outcome of the given game. true for a win, false for a loss
+
+    5b) If the given game_id corresponds to an active game, it returns a JSON object in the form of:
+
+    Sample Output:
+
+        {
+            "game_id": 1,
+            "guesses": [
+                {
+                    "correct_guess": false,
+                    "correct_position": "01",
+                    "correct_letter_incorrect_spot": "34",
+                    "guessed_word": "moler",
+                    "guesses_remaining": 5,
+                    "valid": true
+                }
+            ],
+            "guesses_remaining": 5,
+            "user": 1
+        }
+
+        Output Format:
+            game_id {int}: id of the given game
+            guesses_remaining {}: total guesses remaining in the given game
+            user {int}: id of the user who started the given game
+            guesses {list}: list of all the guesses made in the given game, where:
+                correct_guess {boolean}: states whether the guess matched the secret word
+                correct_position {string}: each index in the guess containing a correct letter in the correct spot
+                correct_letter_incorrect_spot {string}: each index in the guess containing a correct letter in the incorrect spot
+                guessed_word {string}: the word that was guessed
+                guesses_remaining {int}: number of remaining guesses after this guess was made
+                valid {boolean}: boolean representing whether the guess was in the valid word list or not
+
 
 6) Make a guess in an active game:
   http PUT http://127.0.0.1:5000/guess/ guess_to_make:='{"game_id":"#","guess":"     "}'

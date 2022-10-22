@@ -106,16 +106,16 @@ async def gamestate():
             guessInfo = []
 
             for guess in guessList:
-                correct_spot_list = []
-                correct_letter_list = []
+                correct_spot_list = ""
+                correct_letter_list = ""
                 guessed_word = guess['guessed_word']
 
                 for i in range(0, len(guessed_word)):
                     if guessed_word[i] in secret:
                         if guessed_word[i] == secret[i]:
-                            correct_spot_list.append(i)
+                            correct_spot_list = correct_spot_list + str(i)
                         else:
-                            correct_letter_list.append(i)
+                            correct_letter_list = correct_letter_list + str(i)
 
                 correct = False
                 if guess == secret:
@@ -123,11 +123,11 @@ async def gamestate():
 
                 guessDict = {
                     'guessed_word': guessed_word,
-                    'valid': 1,
+                    'valid': True,
                     'correct_guess': correct,
                     'guesses_remaining': 5 - guess['guess_num'],
-                    'correct_letters': correct_letter_list,
-                    'correct_index': correct_spot_list
+                    'correct_letter_incorrect_spot': correct_letter_list,
+                    'correct_position': correct_spot_list
                 }
 
                 guessInfo.append(guessDict)
@@ -142,14 +142,13 @@ async def gamestate():
             return liveGame
 
         else:
-            guessesUsed = 6 - gameinfo[0]['guess_cnt']
+            guessesUsed = len(guesses)
             finalGuess = guessList[guessesUsed - 1]['guessed_word']
             secret = gameinfo[0]['secret_word']
-            
-            if finalGuess == secret:
-                return {"outcome": "Win", "guesses": guessesUsed}
-            else:
-                return {"outcome": "Loss", "guesses": guessesUsed}
+
+            victory = True if finalGuess == secret else False
+
+            return {"victory": victory, "guesses_used": guessesUsed}
     else:
         abort(404)
 
