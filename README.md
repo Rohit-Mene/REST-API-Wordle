@@ -1,6 +1,9 @@
-Gage Giovanni
-Rohit Mene
-Sean McCarthy
+# Team Member Names:
+
+1) Gage Giovanni
+2) Rohit Mene
+3) Sean McCarthy
+
 # cpsc449-project-wordle
 
 # DB Script Excecution Steps -
