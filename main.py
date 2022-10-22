@@ -1,11 +1,8 @@
 
 import dataclasses
-from http.client import HTTPResponse, responses
 import json
 import random
-from re import S
 import sqlite3
-from wsgiref import headers
 from quart import Quart,g,request,abort,Response
 import databases
 
@@ -29,27 +26,28 @@ async def close_connection(exception):
     if db is not None:
          await db.disconnect()
 
-@app.route("/greet",methods=["GET"])
-async def return_Hello():
-    db = await _get_db()
-    all_data = await db.fetch_all("select * from USERDATA")
+@dataclasses.dataclass
+class Guess:
+    game_id: int
+    guess: str
 
-    return list(map(dict,all_data))
-
+# API for User Registration for the game
 @app.route("/registeruser/",methods=["POST"])
 async def registerUser():
     db = await _get_db()
     userDet = await request.get_json()
-    dat_tup={'name': userDet.get('user').get('name'),'password': userDet.get('user').get('pass')}
+    userDetMap={'name': userDet.get('user').get('name'),'password': userDet.get('user').get('pass')}
 
     try:
-     userId= await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",dat_tup,)
+     userId= await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",userDetMap,)
      response = {"message":"User Registration Successful!","user_id":userId}
+
     except sqlite3.IntegrityError as e:
      abort(409,e)
      
     return response,201
 
+#API for User Login for authentication
 @app.route("/login/",methods=["GET"])
 async def loginUser():
     db = await _get_db()
@@ -57,13 +55,37 @@ async def loginUser():
     if data:
      try:
       userDet = await db.fetch_one("select * from USERDATA where user_name = :user and user_pass= :pass",values={"user": data['username'], "pass": data['password']})
-      if userDet is None: 
-         return Response("Unsuccessful authentication",status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}))
+      if (userDet is None): 
+         return Response(json.dumps({"response":"Unsuccessful authentication"}),status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}))
      except sqlite3.IntegrityError as e:
         abort(409,e)
      return Response(json.dumps({"authenticated":True}),status=200)
     else:
-        return Response("Invalid Request!", status=400)
+        return Response(json.dumps({"response":"Invalid Request!"}), status=400)
+
+#API for starting a new game
+@app.route("/startgame/<int:user_id>",methods=["POST"])
+async def startGame(user_id):
+    db = await _get_db()
+    userCheck = await db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
+    if userCheck == None:
+        res={"response":"User not found!"}
+        return res,404
+
+    secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+
+    if secret_word:
+     dbData= {"user_id":user_id,"secret_word":secret_word[0]}
+    
+     try:
+      gameID = await db.execute("""
+      insert into USERGAMEDATA(user_id,secret_word) VALUES(:user_id,:secret_word)
+      """,dbData)
+     except sqlite3.IntegrityError as e:
+      abort(409,e)
+     res={"game_id": gameID}
+     return res,201,{"Location": f"/startgame/{gameID}"}
+
     
 @app.route("/gamestate/", methods=["GET"])
 async def gamestate():
@@ -118,10 +140,6 @@ async def gamestate():
     else:
         abort(404)
 
-@dataclasses.dataclass
-class Guess:
-    game_id: int
-    guess: str
 
 @app.route("/guess/", methods=["PUT"])
 #@validate_request(Guess)
@@ -252,29 +270,6 @@ async def all_games(user_id):
         return Response(json.dumps(list(map(dict,game))), status=201)
     else:
         abort(404)
-
-@app.route("/startgame/<int:user_id>",methods=["POST"])
-async def startGame(user_id):
-    db = await _get_db()
-    userCheck = await db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
-    if userCheck == None:
-        res={"response":"Not Found!"}
-        return res,404
-
-    secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
-
-    dbData={"err":"No Data"}
-    if secret_word:
-     dbData= {"user_id":user_id,"secret_word":secret_word[0]}
-    
-    try:
-     gameID = await db.execute("""
-     insert into USERGAMEDATA(user_id,secret_word) VALUES(:user_id,:secret_word)
-     """,dbData)
-    except sqlite3.IntegrityError as e:
-     abort(409,e)
-    res={"game_id": gameID}
-    return res,201,{"Location": f"/startgame/{gameID}"}
 
 
 @app.errorhandler(404)
