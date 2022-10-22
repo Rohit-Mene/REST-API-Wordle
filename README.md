@@ -5,14 +5,14 @@ Sean McCarthy
 
 # DB Script Excecution Steps -
    1) Run the command  cd bin
-   2) Run command sh init.sh
+   2) Run command $sh init.sh
    3) Run command cd ..
    4) Go to path   cd var
-   5) Run command  sqlite3 project1.db
+   5) Run command  $sqlite3 project1.db
    6) Run command .tables  to check if tables are created
 
 # Start the Server 
-   foreman start
+   $foreman start
 
 -----------------------
 
