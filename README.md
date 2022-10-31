@@ -4,7 +4,6 @@
 2) Rohit Mene
 3) Sean McCarthy
 
-# cpsc449-project-wordle
 
 # DB Script Excecution Steps -
    1) Run the command  cd bin
