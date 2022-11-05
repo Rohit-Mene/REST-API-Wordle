@@ -4,12 +4,13 @@ Sean McCarthy
 # cpsc449-project-wordle
 
 # DB Script Excecution Steps -
-   1) Run the command  cd bin
+   1) GO to path /Project1/bin
    2) Run command sh init.sh
-   3) Run command cd ..
-   4) Go to path   cd var
-   5) Run command  sqlite3 project1.db
-   6) Run command .tables  to check if tables are created
+   3) Go to path /Project1/var
+   4) Run command  sqlite3 user.db
+   5) Run command .tables  to check if tables are created
+   6) Run command  sqlite3 game.db
+   7) Run command .tables  to check if tables are created
 
 -----------------------
 API DOCUMENTATION-
@@ -44,7 +45,7 @@ API DOCUMENTATION-
             }
         
 3) Start a game:
-  http POST http://localhost:5000/startgame/ user:='{"user_id":<user_id>}'
+  http POST http://localhost:5001/startgame/ user:='{"user_id":<user_id>}'
 
   where <user_id> is the id number of the user starting the game
 
@@ -53,11 +54,10 @@ API DOCUMENTATION-
               "game_id": 1
           }
 
-4)Retrieve a list of all active games for a player
-  http GET http://localhost:5000/games/ user:='{"user_id":<user_id>}'
+4)Retrieve a list of all active games for a plater
+  #http GET http://127.0.0.1:5001/games/ user:='{"user_id":#}'
 
-  where <user_id> is the id of a registered user
-
+  Returns dictionary of all active games by a single user with id #
     Sample Output:
         {
             "game_id": 4
@@ -68,10 +68,12 @@ API DOCUMENTATION-
         {
             "game_id": 13
         }
+            Output Format.
+                game_id represents a game that is active for the player in question.
 
 
 5) Get the state of a game
-  http GET http://localhost:5000/gamestate/ game:='{"game_id":<game_id>}'
+  http GET http://localhost:5001/gamestate/ game:='{"game_id":<game_id>}'
 
   where <game_id> is the id number of an existing game
   
@@ -122,7 +124,7 @@ API DOCUMENTATION-
 
 
 6) Make a guess in an active game:
-  http PUT http://localhost:5000/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
+  http PUT http://127.0.0.1:5001/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
 
   Use the JSON format after URL to enter input data for this api. Enter the game ID where <game_id> is and enter guess word where <guess> is.
     
