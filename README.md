@@ -1,21 +1,26 @@
-Gage Giovanni
-Rohit Mene
-Sarthak Gajjar
-Yahya Nashawati
+# Team Member Names:
 
-# cpsc449-project-wordle
+1) Gage Giovanni
+2) Rohit Mene
+3) Sarthak Gajjar
+4) Yahya Nashawati
+
 
 # DB Script Excecution Steps -
    1) Run the command  cd bin
    2) Run command $sh init.sh
    3) Run command cd ..
    4) Go to path   cd var
-   5) Run command  sqlite3 user.db
+   5) Run command  $sqlite3 user.db
    6) Run command .tables  to check if tables are created
-   7) Run command  sqlite3 game.db
+   7) Run command  $sqlite3 game.db
    8) Run command .tables  to check if tables are created
 
+# Start the Server 
+   $foreman start
+
 -----------------------
+
 API DOCUMENTATION-
 1) User registration:
   $http POST http://localhost:5000/registeruser/ user:='{"name":"<name>","pass":"<pass>"}'
@@ -57,10 +62,11 @@ API DOCUMENTATION-
               "game_id": 1
           }
 
-4)Retrieve a list of all active games for a plater
-  $http GET http://localhost:5001/games/ user:='{"user_id":#}'
+4)Retrieve a list of all active games for a player
+  $http GET http://localhost:5001/games/ user:='{"user_id":<user_id>}'
 
-  Returns dictionary of all active games by a single user with id #
+  where <user_id> is the id of a registered user
+
     Sample Output:
         {
             "game_id": 4
@@ -71,8 +77,6 @@ API DOCUMENTATION-
         {
             "game_id": 13
         }
-            Output Format.
-                game_id represents a game that is active for the player in question.
 
 
 5) Get the state of a game
@@ -128,7 +132,7 @@ API DOCUMENTATION-
 
 6) Make a guess in an active game:
   $http PUT http://localhost:5001/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
-
+  Note: The response for positions is 0th Index based.
   Use the JSON format after URL to enter input data for this api. Enter the game ID where <game_id> is and enter guess word where <guess> is.
     
     6a) If the word is the correct word it returns a JSON object in the form of,        
