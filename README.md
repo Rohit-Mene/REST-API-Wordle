@@ -2,7 +2,8 @@
 
 1) Gage Giovanni
 2) Rohit Mene
-3) Sean McCarthy
+3) Sarthak Gajjar
+4) Yahya Nashawati
 
 
 # DB Script Excecution Steps -
@@ -10,8 +11,10 @@
    2) Run command $sh init.sh
    3) Run command cd ..
    4) Go to path   cd var
-   5) Run command  $sqlite3 project1.db
+   5) Run command  $sqlite3 user.db
    6) Run command .tables  to check if tables are created
+   7) Run command  $sqlite3 game.db
+   8) Run command .tables  to check if tables are created
 
 # Start the Server 
    $foreman start
@@ -50,7 +53,7 @@ API DOCUMENTATION-
             }
         
 3) Start a game:
-  $http POST http://localhost:5000/startgame/ user:='{"user_id":<user_id>}'
+  $http POST http://localhost:5001/startgame/ user:='{"user_id":<user_id>}'
 
   where <user_id> is the id number of the user starting the game
 
@@ -60,7 +63,7 @@ API DOCUMENTATION-
           }
 
 4)Retrieve a list of all active games for a player
-  $http GET http://localhost:5000/games/ user:='{"user_id":<user_id>}'
+  $http GET http://localhost:5001/games/ user:='{"user_id":<user_id>}'
 
   where <user_id> is the id of a registered user
 
@@ -77,7 +80,7 @@ API DOCUMENTATION-
 
 
 5) Get the state of a game
-  $http GET http://localhost:5000/gamestate/ game:='{"game_id":<game_id>}'
+  $http GET http://localhost:5001/gamestate/ game:='{"game_id":<game_id>}'
 
   where <game_id> is the id number of an existing game
   
@@ -128,7 +131,7 @@ API DOCUMENTATION-
 
 
 6) Make a guess in an active game:
-  $http PUT http://localhost:5000/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
+  $http PUT http://localhost:5001/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
   Note: The response for positions is 0th Index based.
   Use the JSON format after URL to enter input data for this api. Enter the game ID where <game_id> is and enter guess word where <guess> is.
     
