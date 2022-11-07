@@ -34,15 +34,16 @@ class Guess:
 async def startGame():
     db = await _get_db()
     #userDet = await request.get_json()
-    #user_id = userDet.get('user').get('user_id')
+    #user_name = userDet.get('user').get('user_name')
+    #app.logger.debug(user_name)
     #userCheck = await db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
     #if userCheck == None:
      #   res={"response":"User not found!"}
       #  return res,404
 
     secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
-    game_id = uuid.uuid1().bytes
-    app.logger.debug(int.from_bytes(game_id,"big"))
+    game_id = uuid.uuid1().hex
+    app.logger.debug(game_id)
     if secret_word:
      dbData= {"game_id":game_id,"secret_word":secret_word[0]}
      
@@ -50,9 +51,10 @@ async def startGame():
       gameID = await db.execute("""
       insert into USERGAMEDATA(game_id,secret_word) VALUES(:game_id,:secret_word)
       """,dbData)
+      app.logger.debug(gameID)
      except sqlite3.IntegrityError as e:
       abort(409,e)
-     res={"game_id": gameID}
+     res={"game_id": game_id}
      return res,201,{"Location": f"/startgame/{gameID}"}
 
 # API for getting the state of an existing game
@@ -108,7 +110,7 @@ async def gamestate():
             # return game info and guess data
             liveGame = {
                 'game_id': game_id,
-                'user': gameinfo[0]['user_id'],
+                'user': gameinfo[0]['user_name'],
                 'guesses_remaining': gameinfo[0]['guess_cnt'],
                 'guesses': guessInfo
             }
