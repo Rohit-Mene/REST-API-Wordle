@@ -39,6 +39,7 @@ class Guess:
 @app.route("/startgame/",methods=["POST"])
 async def startGame():
     db = await _get_db()
+    user_db = await _get_user_db()
     #userDet = await request.get_json()
     #user_name = userDet.get('user').get('user_name')
     #app.logger.debug(user_name)
@@ -47,7 +48,7 @@ async def startGame():
      #   res={"response":"User not found!"}
       #  return res,404
 
-    secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+    secret_word= await user_db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
     game_id = uuid.uuid1().hex
     app.logger.debug(game_id)
     if secret_word:
@@ -61,31 +62,6 @@ async def startGame():
      except sqlite3.IntegrityError as e:
       abort(409,e)
      res={"game_id": game_id}
-     return res,201,{"Location": f"/startgame/{gameID}"}
-
-@app.route("/startgame/",methods=["POST"])
-async def startGame():
-    db = await _get_db()
-    user_db = await _get_user_db()
-    userDet = await request.get_json()
-    user_id = userDet.get('user').get('user_id')
-    userCheck = await user_db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
-    if userCheck == None:
-        res={"response":"User not found!"}
-        return res,404
-
-    secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
-
-    if secret_word:
-     dbData= {"user_id":user_id,"secret_word":secret_word[0]}
-    
-     try:
-      gameID = await db.execute("""
-      insert into USERGAMEDATA(user_id,secret_word) VALUES(:user_id,:secret_word)
-      """,dbData)
-     except sqlite3.IntegrityError as e:
-      abort(409,e)
-     res={"game_id": gameID}
      return res,201,{"Location": f"/startgame/{gameID}"}
 
 # API for getting the state of an existing game
