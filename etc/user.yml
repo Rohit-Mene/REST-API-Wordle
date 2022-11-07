@@ -1,0 +1,13 @@
+mount-dir: "./var/user/mount"
+
+data-dir: "./var/user/data"
+
+exec: "hypercorn user --reload --debug --bind user.local.gd:$PORT --access-logfile - --error-logfile - --log-level DEBUG"
+
+http:
+  addr: ":20202"
+
+static:
+  primary: true
+  hostname: "tuffix-vm"
+  advertise-url: "http://tuffix-vm:20202"

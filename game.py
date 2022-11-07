@@ -9,12 +9,18 @@ from quart_schema import QuartSchema
 app = Quart(__name__)
 QuartSchema(app)
 
-#DB Connection
+#Game DB Connection
 async def _get_db():
     db = getattr(g, "_sqlite_db", None)
     if db is None:
         db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/game.db')
         await db.connect()
+    return db
+
+#User DB Connection
+async def _get_user_db():
+    db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/game/mount/user.db')
+    await db.connect()
     return db
 
 #DB Disconnect 
@@ -33,6 +39,7 @@ class Guess:
 @app.route("/startgame/",methods=["POST"])
 async def startGame():
     db = await _get_db()
+    user_db = await _get_user_db()
     #userDet = await request.get_json()
     #user_name = userDet.get('user').get('user_name')
     #app.logger.debug(user_name)

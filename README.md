@@ -53,7 +53,7 @@ API DOCUMENTATION-
             }
         
 3) Start a game:
-  $http POST http://localhost:5001/startgame/ user:='{"user_id":<user_id>}'
+  $http POST http://localhost:5100/startgame/ user:='{"user_id":<user_id>}'
 
   where <user_id> is the id number of the user starting the game
 
@@ -63,7 +63,7 @@ API DOCUMENTATION-
           }
 
 4)Retrieve a list of all active games for a player
-  $http GET http://localhost:5001/games/ user:='{"user_id":<user_id>}'
+  $http GET http://localhost:5100/games/ user:='{"user_id":<user_id>}'
 
   where <user_id> is the id of a registered user
 
@@ -80,7 +80,7 @@ API DOCUMENTATION-
 
 
 5) Get the state of a game
-  $http GET http://localhost:5001/gamestate/ game:='{"game_id":<game_id>}'
+  $http GET http://localhost:5100/gamestate/ game:='{"game_id":<game_id>}'
 
   where <game_id> is the id number of an existing game
   
@@ -131,7 +131,7 @@ API DOCUMENTATION-
 
 
 6) Make a guess in an active game:
-  $http PUT http://localhost:5001/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
+  $http PUT http://localhost:5100/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
   Note: The response for positions is 0th Index based.
   Use the JSON format after URL to enter input data for this api. Enter the game ID where <game_id> is and enter guess word where <guess> is.
     
