@@ -48,7 +48,7 @@ async def startGame():
      #   res={"response":"User not found!"}
       #  return res,404
 
-    secret_word= await user_db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+    secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
     game_id = uuid.uuid1().hex
     app.logger.debug(game_id)
     if secret_word:
