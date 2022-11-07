@@ -12,7 +12,7 @@ QuartSchema(app)
 async def _get_db():
     db = getattr(g, "_sqlite_db", None)
     if db is None:
-        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/user.db')
+        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/user/mount/user.db')
         await db.connect()
     return db
 

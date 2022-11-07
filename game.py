@@ -9,12 +9,18 @@ from quart_schema import QuartSchema
 app = Quart(__name__)
 QuartSchema(app)
 
-#DB Connection
+#Game DB Connection
 async def _get_db():
     db = getattr(g, "_sqlite_db", None)
     if db is None:
         db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/game.db')
         await db.connect()
+    return db
+
+#User DB Connection
+async def _get_user_db():
+    db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/game/mount/user.db')
+    await db.connect()
     return db
 
 #DB Disconnect 
@@ -29,26 +35,51 @@ class Guess:
     game_id: int
     guess: str
 
-#API for starting a new game
+# #API for starting a new game
+# @app.route("/startgame/",methods=["POST"])
+# async def startGame():
+#     db = await _get_db()
+#     #userDet = await request.get_json()
+#     #user_id = userDet.get('user').get('user_id')
+#     #userCheck = await db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
+#     #if userCheck == None:
+#      #   res={"response":"User not found!"}
+#       #  return res,404
+
+#     secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+#     game_id = uuid.uuid1().bytes
+#     app.logger.debug(int.from_bytes(game_id,"big"))
+#     if secret_word:
+#      dbData= {"game_id":game_id,"secret_word":secret_word[0]}
+     
+#      try:
+#       gameID = await db.execute("""
+#       insert into USERGAMEDATA(game_id,secret_word) VALUES(:game_id,:secret_word)
+#       """,dbData)
+#      except sqlite3.IntegrityError as e:
+#       abort(409,e)
+#      res={"game_id": gameID}
+#      return res,201,{"Location": f"/startgame/{gameID}"}
+
 @app.route("/startgame/",methods=["POST"])
 async def startGame():
     db = await _get_db()
-    #userDet = await request.get_json()
-    #user_id = userDet.get('user').get('user_id')
-    #userCheck = await db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
-    #if userCheck == None:
-     #   res={"response":"User not found!"}
-      #  return res,404
+    user_db = await _get_user_db()
+    userDet = await request.get_json()
+    user_id = userDet.get('user').get('user_id')
+    userCheck = await user_db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
+    if userCheck == None:
+        res={"response":"User not found!"}
+        return res,404
 
     secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
-    game_id = uuid.uuid1().bytes
-    app.logger.debug(int.from_bytes(game_id,"big"))
+
     if secret_word:
-     dbData= {"game_id":game_id,"secret_word":secret_word[0]}
-     
+     dbData= {"user_id":user_id,"secret_word":secret_word[0]}
+    
      try:
       gameID = await db.execute("""
-      insert into USERGAMEDATA(game_id,secret_word) VALUES(:game_id,:secret_word)
+      insert into USERGAMEDATA(user_id,secret_word) VALUES(:user_id,:secret_word)
       """,dbData)
      except sqlite3.IntegrityError as e:
       abort(409,e)
