@@ -12,22 +12,23 @@ user_id INTEGER PRIMARY KEY AUTOINCREMENT
 
 DROP TABLE IF EXISTS USERGAMEDATA;
 CREATE TABLE USERGAMEDATA(
-game_id INTEGER PRIMARY KEY AUTOINCREMENT,
-user_id INTEGER,
+game_id TEXT PRIMARY KEY,
+user_name text,
 guess_cnt INT DEFAULT 6,
 game_sts boolean not null check(game_sts IN(0,1)) DEFAULT 0,
-secret_word TEXT,
-foreign key(user_id) REFERENCES USERDATA(user_id)
+secret_word TEXT
 );
+
 
 DROP TABLE IF EXISTS guess;
 CREATE TABLE guess (
     guess_id INTEGER PRIMARY KEY AUTOINCREMENT,
-    game_id INTEGER,
+    game_id TEXT,
     guess_num INTEGER,
     guessed_word CHAR(5),
     foreign key(game_id) REFERENCES USERGAMEDATA(game_id)
 );
+
 
 DROP TABLE IF EXISTS VALIDWORD;
 CREATE TABLE VALIDWORD(
