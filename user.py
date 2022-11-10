@@ -46,6 +46,7 @@ async def registerUser():
 async def loginUser():
     db = await _get_db()
     data =  request.authorization
+    app.logger.debug(data)
     if data:
      try:
         #Find the User details
@@ -54,6 +55,6 @@ async def loginUser():
          return Response(json.dumps({"response":"Unsuccessful authentication"}),status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}), content_type="application/json")
      except sqlite3.IntegrityError as e:
         abort(409,e)
-     return Response(json.dumps({"authenticated":True}),status=200, content_type="application/json")
+        return Response(json.dumps({"authenticated":True}),status=200, content_type="application/json")
     else:
         return Response(json.dumps({"response":"Invalid Request!"}), status=400, content_type="application/json")
