@@ -50,6 +50,9 @@ async def loginUser():
      try:
         #Find the User details
       userDet = await db.fetch_one("select * from USERDATA where user_name = :user and user_pass= :pass",values={"user": data['username'], "pass": data['password']})
+     
+      app.logger.info("select * from USERDATA where user_name = ? and user_pass= ?")
+     
       if (userDet is None): 
          return Response(json.dumps({"response":"Unsuccessful authentication"}),status=401,headers=dict({'WWW-Authenticate': 'Basic realm="Access to staging site"'}), content_type="application/json")
      except sqlite3.IntegrityError as e:

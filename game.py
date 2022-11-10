@@ -33,8 +33,9 @@ class Guess:
 @app.route("/startgame/",methods=["POST"])
 async def startGame():
     db = await _get_db()
-    #userDet = await request.get_json()
-    #user_name = userDet.get('user').get('user_name')
+    userDet = await request.get_json()
+    user_name = userDet.get('user').get('user_name')
+    user_name = str(user_name)
     #app.logger.debug(user_name)
     #userCheck = await db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
     #if userCheck == None:
@@ -42,14 +43,17 @@ async def startGame():
       #  return res,404
 
     secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+
+    app.logger.info("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+
     game_id = uuid.uuid1().hex
     app.logger.debug(game_id)
     if secret_word:
-     dbData= {"game_id":game_id,"secret_word":secret_word[0]}
+     dbData= {"game_id":game_id,"secret_word":secret_word[0],"user_name":user_name}
      
      try:
       gameID = await db.execute("""
-      insert into USERGAMEDATA(game_id,secret_word) VALUES(:game_id,:secret_word)
+      insert into USERGAMEDATA(game_id,secret_word,user_name) VALUES(:game_id,:secret_word,:user_name)
       """,dbData)
       app.logger.debug(gameID)
      except sqlite3.IntegrityError as e:
@@ -67,7 +71,12 @@ async def gamestate():
     game_id = userDet.get('game').get('game_id')
     # retrieve db game date and guess data for the given game_id
     gamestate = await db.fetch_all("select * from USERGAMEDATA where game_id = :game_id", values={"game_id": game_id})
+
+    app.logger.info("select * from USERGAMEDATA where game_id = ?")
+
     guesses = await db.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
+
+    app.logger.info("select guess_num, guessed_word from guess where game_id = ?")
 
     if gamestate:
         gameinfo = list(map(dict,gamestate))
@@ -149,6 +158,9 @@ async def make_guess():
             """, 
             string_guess,
         )
+
+        app.logger.info("SELECT word_id FROM VALIDWORD WHERE EXISTS(SELECT word_id FROM VALIDWORD WHERE valid_word = ?)")
+
     except sqlite3.IntegrityError as e:
         abort(500, e)
     #check to see if word entered is not on valid list
@@ -168,7 +180,8 @@ async def make_guess():
                 SELECT guess_cnt FROM USERGAMEDATA WHERE game_id = :game_id
             """,
             guess_id,
-        )     
+        )
+        app.logger.info("SELECT guess_cnt FROM USERGAMEDATA WHERE game_id = ?")     
     except sqlite3.IntegrityError as e:
         abort(500, e)
     #determine if the game is an active game
@@ -294,14 +307,15 @@ async def all_games():
     #connect to db
     db = await _get_db()
     userDet = await request.get_json()
-    user_id = {"user_id": userDet.get('user').get('user_id')}
+    user_id = {"user_name": userDet.get('user').get('user_name')}
     #select all active games for a single user
     game = await db.fetch_all(
         """
-            select game_id from USERGAMEDATA where user_id = :user_id AND game_sts = FALSE
+            select game_id from USERGAMEDATA where user_name = :user_name AND game_sts = FALSE
         """, user_id, 
     
     )
+    app.logger.info("select game_id from USERGAMEDATA where user_name = ? AND game_sts = FALSE")
     if game:
         return list(map(dict,game)),201
     else:
