@@ -45,19 +45,19 @@ API DOCUMENTATION-
             }
         
 3) Start a game:
-  http POST http://localhost:5001/startgame/ user:='{"user_id":<user_id>}'
+  http POST http://localhost:5001/startgame/ user:='{"user_name":<user_name>}'
 
-  where <user_id> is the id number of the user starting the game
+  where <user_name> is the name of the user starting the game
 
       Sample Output:
           {
-              "game_id": 1
+              "game_id": "f6514c5060a311ed83c79b083e15e21b"
           }
 
 4)Retrieve a list of all active games for a plater
-  #http GET http://127.0.0.1:5001/games/ user:='{"user_id":#}'
+  #http GET http://127.0.0.1:5001/games/ user:='{"user_name":<user_name>}'
 
-  Returns dictionary of all active games by a single user with id #
+  Returns dictionary of all active games by a single user with the user name
     Sample Output:
         {
             "game_id": 4
