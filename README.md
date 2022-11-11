@@ -1,16 +1,21 @@
-Gage Giovanni
-Rohit Mene
-Sean McCarthy
+1)Gage Giovanni
+2)Rohit Mene
+3)Yahya Nashawati
+4) Sarthak Gajjar
 # cpsc449-project-wordle
 
 # DB Script Excecution Steps -
-   1) GO to path /Project1/bin
+   1) GO to path /bin
    2) Run command sh init.sh
-   3) Go to path /Project1/var
+   3) Go to path /var
    4) Run command  sqlite3 user.db
    5) Run command .tables  to check if tables are created
    6) Run command  sqlite3 game.db
    7) Run command .tables  to check if tables are created
+
+# Nginx & foreman process start
+ 1) Add nginx configuration file to /etc/nginx/sites-enabled
+ 2) From the project path start foreman with command -> foreman start --formation game=3,user=1
 
 -----------------------
 API DOCUMENTATION-
