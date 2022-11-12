@@ -20,8 +20,7 @@
 -----------------------
 API DOCUMENTATION-
 1) User registration:
-  http POST http://localhost:5000/registeruser/ user:='{"name":"<name>","pass":"<pass>"}'
-
+  http POST http://tuffix-vm/registeruser/ user:='{"name":"<name>","pass":"<pass>"}'
   where <name> is the username of the new user and <pass> is the password of the new user
 
     Sample Output:
@@ -31,7 +30,7 @@ API DOCUMENTATION-
         }
 
 2) User Login:
-  http --form --auth name:pass --auth-type basic GET http://localhost:5000/login/
+  http --form --auth name:pass --auth-type basic GET http://tuffix-vm/login/
 
   where <name> is the user name of the user trying to login and <pass > is the password of the user trying to login
 
@@ -50,7 +49,7 @@ API DOCUMENTATION-
             }
         
 3) Start a game:
-  http POST http://localhost:5001/startgame/ user:='{"user_name":<user_name>}'
+  http --auth name:pass --auth-type basic POST http://tuffix-vm/startgame/ user:='{"user_name":"<user_name>"}'
 
   where <user_name> is the name of the user starting the game
 
@@ -60,7 +59,7 @@ API DOCUMENTATION-
           }
 
 4)Retrieve a list of all active games for a plater
-  #http GET http://127.0.0.1:5001/games/ user:='{"user_name":<user_name>}'
+  #http --auth name:pass --auth-type basic GET http://tuffix-vm/games/ user:='{"user_name":"<user_name>"}'
 
   Returns dictionary of all active games by a single user with the user name
     Sample Output:
@@ -78,7 +77,7 @@ API DOCUMENTATION-
 
 
 5) Get the state of a game
-  http GET http://localhost:5001/gamestate/ game:='{"game_id":<game_id>}'
+  http --auth name:pass --auth-type basic GET http://tuffix-vm/gamestate/ game:='{"game_id":<game_id>}'
 
   where <game_id> is the id number of an existing game
   
@@ -129,7 +128,7 @@ API DOCUMENTATION-
 
 
 6) Make a guess in an active game:
-  http PUT http://127.0.0.1:5001/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
+  http --auth name:pass --auth-type basic PUT http://tuffix-vm/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
 
   Use the JSON format after URL to enter input data for this api. Enter the game ID where <game_id> is and enter guess word where <guess> is.
     
