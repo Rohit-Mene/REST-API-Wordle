@@ -49,9 +49,8 @@ API DOCUMENTATION-
             }
         
 3) Start a game:
-  http --auth name:pass --auth-type basic POST http://tuffix-vm/startgame/ user:='{"user_name":"<user_name>"}'
+  http --auth name:pass --auth-type basic POST http://tuffix-vm/startgame/
 
-  where <user_name> is the name of the user starting the game
 
       Sample Output:
           {
@@ -59,7 +58,7 @@ API DOCUMENTATION-
           }
 
 4)Retrieve a list of all active games for a plater
-  #http --auth name:pass --auth-type basic GET http://tuffix-vm/games/ user:='{"user_name":"<user_name>"}'
+  http --auth name:pass --auth-type basic GET http://tuffix-vm/games/
 
   Returns dictionary of all active games by a single user with the user name
     Sample Output:
