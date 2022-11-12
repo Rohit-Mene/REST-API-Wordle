@@ -1,7 +1,7 @@
 1)Gage Giovanni
 2)Rohit Mene
 3)Yahya Nashawati
-4) Sarthak Gajjar
+4)Sarthak Gajjar
 # cpsc449-project-wordle
 
 # DB Script Excecution Steps -

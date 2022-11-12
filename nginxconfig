@@ -28,7 +28,6 @@ server {
                proxy_pass http://localhost:5000/registeruser/;
        }
 
-
        location = /auth {
                internal;
                proxy_pass http://localhost:5000/login/;

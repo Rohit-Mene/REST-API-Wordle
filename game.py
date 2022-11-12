@@ -33,6 +33,7 @@ class Guess:
 @app.route("/startgame/",methods=["POST"])
 async def startGame():
     db = await _get_db()
+    data =  request.authorization
     userDet = await request.get_json()
     user_name = userDet.get('user').get('user_name')
     user_name = str(user_name)
@@ -44,7 +45,7 @@ async def startGame():
     secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
     game_id = uuid.uuid1().hex
     if secret_word:
-     dbData= {"game_id":game_id,"secret_word":secret_word[0],"user_name":user_name}
+     dbData= {"game_id":game_id,"secret_word":secret_word[0],"user_name":data['username']}
     
      try:
       gameID = await db.execute("""
