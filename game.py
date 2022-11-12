@@ -1,7 +1,6 @@
 import dataclasses
-import json
 import sqlite3
-from quart import Quart,g,request,abort,Response
+from quart import Quart,g,request,abort
 import databases
 from quart_schema import QuartSchema
 import uuid
@@ -34,13 +33,6 @@ class Guess:
 async def startGame():
     db = await _get_db()
     data =  request.authorization
-    userDet = await request.get_json()
-    user_name = userDet.get('user').get('user_name')
-    user_name = str(user_name)
-    # userCheck = await db.fetch_one("select user_id from USERDATA where user_id = :user_id",values={"user_id":user_id})
-    # if userCheck == None:
-    #     res={"response":"User not found!"}
-    #     return res,404
 
     secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
     game_id = uuid.uuid1().hex
@@ -292,13 +284,13 @@ async def make_guess():
 async def all_games():
     #connect to db
     db = await _get_db()
-    userDet = await request.get_json()
-    user_id = {"user_name": userDet.get('user').get('user_name')}
+    data =  request.authorization
+    user_name = {"user_name": data['username']}
     #select all active games for a single user
     game = await db.fetch_all(
         """
             select game_id from USERGAMEDATA where user_name = :user_name AND game_sts = FALSE
-        """, user_id, 
+        """, user_name, 
     
     )
     if game:

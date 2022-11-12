@@ -1,4 +1,3 @@
-import dataclasses
 import json
 import sqlite3
 from quart import Quart,g,request,abort,Response
@@ -34,7 +33,7 @@ async def registerUser():
         #Passes the username and password given by user 
      userId= await db.execute("""INSERT INTO USERDATA(user_name,user_pass) VALUES(:name,:password)""",userDetMap,)
      #Takes in userID received from the user to generate a response
-     response = {"message":"User Registration Successful!","user_id":userId}
+     response = {"message":"User Registration Successful!","user_name":userDet.get('user').get('name')}
 
     except sqlite3.IntegrityError as e:
      abort(409,e)
