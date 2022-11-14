@@ -48,7 +48,7 @@ API DOCUMENTATION-
                 "response": "Unsuccessful authentication"
             }
         
-3) Start a game:
+ 3) Start a game:
   http --auth name:pass --auth-type basic POST http://tuffix-vm/startgame/
 
 
