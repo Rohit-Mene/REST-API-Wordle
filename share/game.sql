@@ -35,6 +35,12 @@ CREATE TABLE VALIDWORD(
 word_id INTEGER PRIMARY KEY AUTOINCREMENT,
 valid_word TEXT
 );
+
+CREATE INDEX guess_idx_03a6cf4e ON guess(game_id);
+CREATE INDEX VALIDWORD_idx_c0412b53 ON VALIDWORD(valid_word);
+CREATE INDEX USERGAMEDATA_idx_26cee456 ON USERGAMEDATA(user_name, game_sts);
+
+
 insert into VALIDWORD(valid_word) VALUES('aahed');
 insert into VALIDWORD(valid_word) VALUES('aalii');
 insert into VALIDWORD(valid_word) VALUES('aapas');

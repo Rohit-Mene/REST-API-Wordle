@@ -9,5 +9,5 @@ user_name text not null,
 user_pass text not null,
 user_id INTEGER PRIMARY KEY AUTOINCREMENT
 );
-
+CREATE INDEX USERDATA_idx_861e4408 ON USERDATA(user_name, user_pass);
 COMMIT;
