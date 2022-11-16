@@ -4,6 +4,21 @@ server {
 
        server_name tuffix-vm;
 
+        location = /auth {
+               internal;
+               proxy_pass http://localhost:5000/login/;
+       }
+
+       location /registeruser/ {
+               proxy_pass http://localhost:5000/registeruser/;
+       }
+
+       location /login/ {
+               auth_request /auth;
+               proxy_pass http://localhost:5000/login/;
+       }
+       
+
        location /startgame/ {
                auth_request /auth;
                proxy_pass http://backend;
@@ -22,15 +37,6 @@ server {
        location /games/ {
                auth_request /auth;
                proxy_pass http://backend;
-       }
-
-       location /registeruser/ {
-               proxy_pass http://localhost:5000/registeruser/;
-       }
-
-       location = /auth {
-               internal;
-               proxy_pass http://localhost:5000/login/;
        }
 }
 
