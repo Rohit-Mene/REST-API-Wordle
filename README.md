@@ -14,7 +14,9 @@
    7) Run command .tables  to check if tables are created
 
 # Nginx & foreman process start
- 1) Add nginx configuration file to /etc/nginx/sites-enabled
+ 1) Find nginx configuration in the file named "nginxconfig" present in project to the path /etc/nginx/sites-enabled
+    Note : Add the nginx configuration in the "default" file present in /etc/nginx/sites-enabled
+
  2) From the project path start foreman with command -> foreman start --formation game=3,user=1
 
 -----------------------
