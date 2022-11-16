@@ -59,7 +59,7 @@ API DOCUMENTATION-
               "game_id": "f6514c5060a311ed83c79b083e15e21b"
           }
 
-4)Retrieve a list of all active games for a plater
+4)Retrieve a list of all active games for a player
   http --auth name:pass --auth-type basic GET http://tuffix-vm/games/
 
   Returns dictionary of all active games by a single user with the user name
