@@ -76,8 +76,7 @@ API DOCUMENTATION-
             Output Format.
                 game_id represents a game that is active for the player in question.
 
-
-5) Get the state of a game
+5)Get the state of a game
   http --auth name:pass --auth-type basic GET http://tuffix-vm/gamestate/ game:='{"game_id":<game_id>}'
 
   where <game_id> is the id number of an existing game
