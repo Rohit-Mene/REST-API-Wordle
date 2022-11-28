@@ -5,6 +5,8 @@ import databases
 from quart_schema import QuartSchema
 import uuid
 
+import random
+
 app = Quart(__name__)
 QuartSchema(app)
 
@@ -47,11 +49,21 @@ class Guess:
 #API for starting a new game
 @app.route("/startgame/",methods=["POST"])
 async def startGame():
+    connect=[]
     db = await _get_db()
     db_sc = await _get_db_secondary1()
+    db_sc2 =await _get_db_secondary2()
     data =  request.authorization
+    connect.append(db)
+    connect.append(db_sc)
+    connect.append(db_sc2)
+    not_found_connection = True
+    while not_found_connection:
+        dbResp = random.choice(connect)
+        if dbResp.is_connected:  
+            not_found_connection= False
 
-    secret_word= await db_sc.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+    secret_word= await dbResp.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
     game_id = uuid.uuid1().hex
     if secret_word:
      dbData= {"game_id":game_id,"secret_word":secret_word[0],"user_name":data['username']}
