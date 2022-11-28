@@ -1,4 +1,4 @@
--- $ sqlite3 ./var/project1.db < ./share/validword.sql
+-- $ sqlite3 ./var/primary/mount/project1.db < ./share/validword.sql
 
 PRAGMA foreign_keys=ON;
 BEGIN TRANSACTION;

@@ -12,7 +12,23 @@ QuartSchema(app)
 async def _get_db():
     db = getattr(g, "_sqlite_db", None)
     if db is None:
-        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/game.db')
+        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/primary/mount/game.db')
+        await db.connect()
+    return db
+
+#DB Connection
+async def _get_db_secondary1():
+    db = getattr(g, "_sqlite_db", None)
+    if db is None:
+        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/secondary1/mount/game.db')
+        await db.connect()
+    return db
+
+#DB Connection
+async def _get_db_secondary2():
+    db = getattr(g, "_sqlite_db", None)
+    if db is None:
+        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/secondary2/mount/game.db')
         await db.connect()
     return db
 
@@ -32,9 +48,10 @@ class Guess:
 @app.route("/startgame/",methods=["POST"])
 async def startGame():
     db = await _get_db()
+    db_sc = await _get_db_secondary1()
     data =  request.authorization
 
-    secret_word= await db.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
+    secret_word= await db_sc.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
     game_id = uuid.uuid1().hex
     if secret_word:
      dbData= {"game_id":game_id,"secret_word":secret_word[0],"user_name":data['username']}
