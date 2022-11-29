@@ -4,33 +4,19 @@ from quart import Quart,g,request,abort
 import databases
 from quart_schema import QuartSchema
 import uuid
-
 import random
 
 app = Quart(__name__)
 QuartSchema(app)
 
-#DB Connection
-async def _get_db():
-    db = getattr(g, "_sqlite_db", None)
-    if db is None:
-        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/primary/mount/game.db')
-        await db.connect()
-    return db
+connection_path=["primary","secondary1","secondary2"]
 
 #DB Connection
-async def _get_db_secondary1():
-    db = getattr(g, "_sqlite_db", None)
-    if db is None:
-        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/secondary1/mount/game.db')
-        await db.connect()
-    return db
-
-#DB Connection
-async def _get_db_secondary2():
-    db = getattr(g, "_sqlite_db", None)
-    if db is None:
-        db = g._sqlite_db = databases.Database('sqlite+aiosqlite:/var/secondary2/mount/game.db')
+async def _get_db(dbType):
+    db_name = "_sqlite_db"+dbType
+    db = getattr(g, dbType, None)
+    if db is None:        
+        db = g.db_name = databases.Database('sqlite+aiosqlite:/var/'+dbType+'/mount/game.db')
         await db.connect()
     return db
 
@@ -48,20 +34,12 @@ class Guess:
 
 #API for starting a new game
 @app.route("/startgame/",methods=["POST"])
-async def startGame():
-    connect=[]
-    db = await _get_db()
-    db_sc = await _get_db_secondary1()
-    db_sc2 =await _get_db_secondary2()
+async def startGame():    
+    db = await _get_db("primary")
     data =  request.authorization
-    connect.append(db)
-    connect.append(db_sc)
-    connect.append(db_sc2)
-    not_found_connection = True
-    while not_found_connection:
-        dbResp = random.choice(connect)
-        if dbResp.is_connected:  
-            not_found_connection= False
+    dbResp = await _get_db(random.choice(connection_path))  
+    answer=  random.choice(connection_path)
+    app.logger.info(answer)
 
     secret_word= await dbResp.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
     game_id = uuid.uuid1().hex
