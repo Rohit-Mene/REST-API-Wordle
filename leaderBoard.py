@@ -26,14 +26,12 @@ async def postScore():
     else:
         current_score = 0      
     
-   
+    score=current_score
+    games= 1
     if r.hexists(game_id,"total_score"):
 
         score = r.hincrby(game_id,"total_score", current_score)
         games = r.hincrby(game_id,"no_of_games", 1)
-        average = score/games
-       # r.zadd("leaderBoard",str(average),str(game_id))
-        return str(average)
         
     else:
     
@@ -41,13 +39,16 @@ async def postScore():
         "no_of_games": 1,
         "total_score":current_score
 })
-
-   
-    #rank = r.zrange("leaderBoard",0,9)    
-    #return json.dumps(rank)
+    average = math.ceil(score/games)
+    r.zadd("leaderBoard",{average:game_id})
+    rank = r.zrange("leaderBoard",0,2) 
+    res = []
+    for l in rank:
+        res.append(l.decode('utf-8'))
+    return json.dumps(res)
     
     
-    return "some"
+    #return "some"
 
     
 
