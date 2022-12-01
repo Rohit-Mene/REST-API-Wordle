@@ -4,6 +4,18 @@
 4)Nicholas Fonseca
 # cpsc449-project-wordle
 
+# Folder and file creation
+  Create three sets of directories in REST-API-WORDLE/var with the following structure:
+var
+├── primary
+│   ├── data
+│   └── mount
+├── secondary1
+|   ├── data
+|   └── mount
+└── secondary2
+    ├── data
+    └── mount  
 # Nginx & foreman process start
  1) Find nginx configuration in the file named "nginxconfig" present in project to the path /etc/nginx/sites-enabled
     Note : Add the nginx configuration in the "default" file present in /etc/nginx/sites-enabled
