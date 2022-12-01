@@ -1,6 +1,7 @@
 from quart import Quart, request
 from quart_schema import QuartSchema
 import redis
+import math
 
 app = Quart(__name__)
 QuartSchema(app)
@@ -17,24 +18,37 @@ async def postScore():
 
     
     guess_to_score = {1:6,2:5,3:4,4:3,5:2,6:1}
+    
 
     if game_status == "win":
         current_score = guess_to_score.get(no_of_guesses)
     else:
         current_score = 0      
+    
+   
+    if r.hexists(game_id,"total_score"):
 
-    if r.hexists(game_id,no_of_guesses):
-
-        r.hincrby(game_id,"total_score", current_score)
-        r.hincrby(game_id,"no_of_games", 1)
+        score = r.hincrby(game_id,"total_score", current_score)
+        games = r.hincrby(game_id,"no_of_games", 1)
+        average = math.ceil(score/games)
+        return str(average)
+        
     else:
     
         result = r.hmset(game_id,{   
-        "no_of_games": no_of_guesses,
-        "total_score":guess_to_score   
+        "no_of_games": 1,
+        "total_score":current_score
 })
-
+    #average = math.ceil(score/games)
+    #return str(average)
+    #r.zadd("leaderBoard", average,str(game_id))
     
+    #return r.zscore("leaderBoard",str(game_id))
+    #return r.hget(game_id,"total_score")
+    #return r.zcount("leaderBoard",0,50)
+    
+    
+    return "some"
 
     
 
