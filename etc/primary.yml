@@ -1,6 +1,6 @@
-mount-dir: "/home/debdyuti/Desktop/REST-API-Wordle/var/primary/mount"
+mount-dir: "./var/primary/mount"
 
-data-dir: "/home/debdyuti/Desktop/REST-API-Wordle/var/primary/data"
+data-dir: "./var/primary/data"
 
 exec: "hypercorn game --reload --debug --bind game.local.gd:$PORT --access-logfile - --error-logfile - --log-level DEBUG"
 

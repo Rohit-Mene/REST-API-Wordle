@@ -1,23 +1,28 @@
-1)Gage Giovanni
-2)Rohit Mene
-3)Yahya Nashawati
-4)Sarthak Gajjar
+1)Rohit Mene
+2)Debdyuti Das
+3)Apeksha Shah
+4)Nicholas Fonseca
 # cpsc449-project-wordle
+
+# Nginx & foreman process start
+ 1) Find nginx configuration in the file named "nginxconfig" present in project to the path /etc/nginx/sites-enabled
+    Note : Add the nginx configuration in the "default" file present in /etc/nginx/sites-enabled
+
+ 2) From the project path start foreman with command -> foreman start 
+
 
 # DB Script Excecution Steps -
    1) GO to path /bin
    2) Run command sh init.sh
    3) Go to path /var
    4) Run command  sqlite3 user.db
-   5) Run command .tables  to check if tables are created
-   6) Run command  sqlite3 game.db
-   7) Run command .tables  to check if tables are created
+   5) Go to path /var/primary/mount   
+   6) Run command .tables  to check if tables are created
+   7) Run command  sqlite3 game.db
+   8) Run command .tables  to check if tables are created
 
-# Nginx & foreman process start
- 1) Find nginx configuration in the file named "nginxconfig" present in project to the path /etc/nginx/sites-enabled
-    Note : Add the nginx configuration in the "default" file present in /etc/nginx/sites-enabled
-
- 2) From the project path start foreman with command -> foreman start --formation game=3,user=1
+# Extra step-
+Make sure litefs file has 'Allow executing file as program' permission enabled
 
 -----------------------
 API DOCUMENTATION-
@@ -176,5 +181,8 @@ API DOCUMENTATION-
             Output Format.
                 valid represents if the word guessed is a valid guess.
                 guess_rem represents the number of guesses remaining.
+
+    7) Leaderboard API for posting the results of a game
+    http POST http://localhost:5050/postScore/ post_score:='{"game_id":3,"no_of_guesses":4,"game_status":"win"}'
 
 

@@ -46,17 +46,3 @@ async def postScore():
     for l in rank:
         res.append(l.decode('utf-8'))
     return json.dumps(res)
-    
-    
-    #return "some"
-
-    
-
-
-
-
-
-
-
-
-
