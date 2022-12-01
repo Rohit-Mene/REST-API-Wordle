@@ -2,6 +2,7 @@ from quart import Quart, request
 from quart_schema import QuartSchema
 import redis
 import math
+import json
 
 app = Quart(__name__)
 QuartSchema(app)
@@ -30,7 +31,8 @@ async def postScore():
 
         score = r.hincrby(game_id,"total_score", current_score)
         games = r.hincrby(game_id,"no_of_games", 1)
-        average = math.ceil(score/games)
+        average = score/games
+       # r.zadd("leaderBoard",str(average),str(game_id))
         return str(average)
         
     else:
@@ -39,13 +41,10 @@ async def postScore():
         "no_of_games": 1,
         "total_score":current_score
 })
-    #average = math.ceil(score/games)
-    #return str(average)
-    #r.zadd("leaderBoard", average,str(game_id))
-    
-    #return r.zscore("leaderBoard",str(game_id))
-    #return r.hget(game_id,"total_score")
-    #return r.zcount("leaderBoard",0,50)
+
+   
+    #rank = r.zrange("leaderBoard",0,9)    
+    #return json.dumps(rank)
     
     
     return "some"
@@ -56,44 +55,7 @@ async def postScore():
 
 
 
-# result = r.hset(1, "name", "jane")
-
-# print(result)
-
-# result = r.hexists(1)
-# print(result) 
-
-# resultget = r.hget(1, "name")
-# print(resultget)
 
 
 
 
-# result = r.hmset("leader",{
-# "game_id": 1,
-# "no_of_games": 1,
-# "total_score":1
-# })
-
-
-# result1 = r.hmset("leader",{
-# "game_id": 2,
-# "no_of_games": 2,
-# "total_score":2
-# })
-
-
-
-# print(r.hmget("leader","game_id","no_of_games"))
-
-
-# result = r.hexists("person1-hash","money")
-# print(result)
-# r.hset("person1-hash", "money", 100)
-
-# # Hash increment by
-# result = r.hincrby("person1-hash", "money", 10)
-# print(result)
-
-# result2 = r.hincrby("person1-hash", "money", -20)
-# print(result2)
