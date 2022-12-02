@@ -46,3 +46,15 @@ async def postScore():
     for l in rank:
         res.append(l.decode('utf-8'))
     return json.dumps(res)
+
+
+@app.route("/leaderboard", methods=["GET"])
+async def get_leaderboard():
+    """
+    
+    """
+    top_users = r.zrevrange("leaderBoard", 0, 9)
+    print('hrm')
+    print(top_users)
+
+    return None
