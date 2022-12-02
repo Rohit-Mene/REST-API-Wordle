@@ -7,45 +7,32 @@ import json
 app = Quart(__name__)
 QuartSchema(app)
 
-r = redis.Redis()
+r = redis.Redis(decode_responses=True)
 
-@app.route("/postScore/", methods=["POST"])
+@app.route("/leaderboard", methods=["POST"])
 async def postScore():
 
-    userDetails = await request.get_json()
-    game_id = userDetails.get('post_score').get('game_id')
-    no_of_guesses = userDetails.get('post_score').get('no_of_guesses')
-    game_status = userDetails.get('post_score').get('game_status')
+    user_details = await request.get_json()
+    print(user_details)
+    try:
+        user_name = user_details["uname"]
+        guesses = user_details["guesses"]
+        win = user_details["win"]
+    except TypeError:
+        return {msg:"Error: data improperly formed"}, 400
 
-    
-    guess_to_score = {1:6,2:5,3:4,4:3,5:2,6:1}
-    
+    game_score = win * (7 - guesses)
 
-    if game_status == "win":
-        current_score = guess_to_score.get(no_of_guesses)
-    else:
-        current_score = 0      
-    
-    score=current_score
-    games= 1
-    if r.hexists(game_id,"total_score"):
+    # NOTE: INCRBY creates the key if it doesn't exist:
+    # https://database.guide/redis-incrby-command-explained/
+    t_score = r.hincrby(user_name, "total_score", game_score)
+    t_games = r.hincrby(user_name, "no_of_games", 1)
 
-        score = r.hincrby(game_id,"total_score", current_score)
-        games = r.hincrby(game_id,"no_of_games", 1)
-        
-    else:
-    
-        result = r.hmset(game_id,{   
-        "no_of_games": 1,
-        "total_score":current_score
-})
-    average = math.ceil(score/games)
-    r.zadd("leaderBoard",{average:game_id})
-    rank = r.zrange("leaderBoard",0,2) 
-    res = []
-    for l in rank:
-        res.append(l.decode('utf-8'))
-    return json.dumps(res)
+    average = t_score / t_games
+    r.zadd("leaderboard", {user_name: float(average)})
+    rank = r.zrange("leaderboard",0,2) 
+    return "success", 200
+
 
 
 @app.route("/leaderboard", methods=["GET"])
@@ -53,8 +40,6 @@ async def get_leaderboard():
     """
     
     """
-    top_users = r.zrevrange("leaderBoard", 0, 9)
-    print('hrm')
-    print(top_users)
+    top_users = r.zrevrange("leaderboard", 0, 9)
 
-    return None
+    return {"leaders":top_users}, 200
