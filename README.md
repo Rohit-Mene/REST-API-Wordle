@@ -7,15 +7,17 @@
 
 # Setup and Operation Guide
 ## Setup
-1) Copy nginxconfig to /etc/nginx/sites-enabled:
+1) Copy nginxconfig to /etc/nginx/sites-enabled:<br />
     sudo cp nginxconfig /etc/nginx/site-enabled
-2) Run init script:
+    
+2) Run init script:<br />
     bin/init.sh
-3) Ensure litefs has proper permissions
+    
+3) Ensure litefs has proper permissions<br />
     chmod 777 litefs
 
 ## Operation
-1) Run foreman
+1) Run foreman:<br />
     Foreman start
 
 ## Easy copy
