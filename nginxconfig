@@ -39,7 +39,7 @@ server {
                proxy_pass http://backend;
        }
 
-       location /leaderboard/ {
+       location /leaderboard {
                proxy_pass http://localhost:5050/leaderboard;
        }
 }
