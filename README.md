@@ -2,8 +2,9 @@
 ## Part 4
 1)Rohit Mene
 2)Debdyuti Das
-3)Apeksha Shah
-4)Nicholas Fonseca
+3)Nicholas Fonseca
+4)Apeksha Shah
+
 
 # Setup and Operation Guide
 ## Setup
