@@ -8,24 +8,24 @@
 # Setup and Operation Guide
 ## Setup
 1) Copy nginxconfig to /etc/nginx/sites-enabled:<br />
-    sudo cp nginxconfig /etc/nginx/site-enabled
+       sudo cp nginxconfig /etc/nginx/site-enabled
     
 2) Run init script:<br />
-    bin/init.sh
+       bin/init.sh
     
 3) Ensure litefs has proper permissions<br />
-    chmod 777 litefs
+      chmod 777 litefs
 
 ## Operation
 1) Run foreman:<br />
-    Foreman start
+      foreman start
 
-## Easy copy
+## Commands for Reference
 ```
 sudo cp nginxconfig /etc/nginx/site-enabled
 bin/init.sh
 chmod 777 litefs
-Foreman start
+foreman start
 ```
 
 -----------------------
@@ -191,10 +191,10 @@ API DOCUMENTATION-
 
     Note that, as the url is internal, the url is local:5050 rather than tuffy-vm
 
-    Response will be 200 if accepted, 400 if data is wrong
+     Response will be 200 if accepted, 400 if data is wrong
 
     8) Leaderboard API for getting top 10
     http GET http://tuffy-vm/leaderboard
 
-    Response will be 200 with payload {"leaders":<list of top 10>}
+      Response will be 200 with payload {"leaders":<list of top 10>}
 
