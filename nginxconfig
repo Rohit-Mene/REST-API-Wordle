@@ -45,7 +45,7 @@ server {
 }
 
 upstream backend {
- server localhost:5100;
  server localhost:5200;
  server localhost:5300;
+ server localhost:5400;
 }
