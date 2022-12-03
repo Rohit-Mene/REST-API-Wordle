@@ -8,7 +8,7 @@
 # Setup and Operation Guide
 ## Setup
 ### 1) Copy nginxconfig to /etc/nginx/sites-enabled:<br />
-       sudo cp nginxconfig /etc/nginx/site-enabled
+       sudo cp nginxconfig /etc/nginx/sites-enabled
        
 ### 2) Run the directory creation shell file from path   REST-API-Wordle/bin :<br />
        sh dircreation.sh
