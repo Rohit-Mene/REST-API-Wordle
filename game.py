@@ -14,7 +14,7 @@ connection_path=["primary","secondary1","secondary2"]
 #DB Connection
 async def _get_db(dbType):
     db_name = "_sqlite_db"+dbType
-    db = getattr(g, dbType, None)
+    db = getattr(g, db_name, None)
     if db is None:        
         db = g.db_name = databases.Database('sqlite+aiosqlite:/var/'+dbType+'/mount/game.db')
         await db.connect()
@@ -38,8 +38,6 @@ async def startGame():
     db = await _get_db("primary")
     data =  request.authorization
     dbResp = await _get_db(random.choice(connection_path))  
-    answer=  random.choice(connection_path)
-    app.logger.info(answer)
 
     secret_word= await dbResp.fetch_one("select correct_word from CORRECTWORD ORDER BY RANDOM() LIMIT 1;")
     game_id = uuid.uuid1().hex
@@ -59,13 +57,13 @@ async def startGame():
 @app.route("/gamestate/", methods=["GET"])
 async def gamestate():
     # contact db
-    db = await _get_db()
+    dbResp = await _get_db(random.choice(connection_path))  
     # retrieve input JSON
     userDet = await request.get_json()
     game_id = userDet.get('game').get('game_id')
     # retrieve db game date and guess data for the given game_id
-    gamestate = await db.fetch_all("select * from USERGAMEDATA where game_id = :game_id", values={"game_id": game_id})
-    guesses = await db.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
+    gamestate = await dbResp.fetch_all("select * from USERGAMEDATA where game_id = :game_id", values={"game_id": game_id})
+    guesses = await dbResp.fetch_all("select guess_num, guessed_word from guess where game_id = :game_id", values={"game_id": game_id})
 
     if gamestate:
         gameinfo = list(map(dict,gamestate))
@@ -132,7 +130,8 @@ async def gamestate():
 @app.route("/guess/", methods=["PUT"])
 async def make_guess():
     #contact db
-    db = await _get_db()
+    db = await _get_db("primary")
+    dbResp = await _get_db(random.choice(connection_path)) 
     #retrieve json
     data = await request.get_json()
     #store game id input
@@ -141,7 +140,7 @@ async def make_guess():
     string_guess = {'guess': data.get('guess_to_make').get('guess')}
     #check to see if word entered is a valid guess
     try:
-        valid_check = await db.fetch_val(
+        valid_check = await dbResp.fetch_val(
             """
                 SELECT word_id FROM VALIDWORD WHERE EXISTS(SELECT word_id FROM VALIDWORD WHERE valid_word = :guess)
             """, 
@@ -151,7 +150,7 @@ async def make_guess():
         abort(500, e)
     #check to see if word entered is not on valid list
     try:
-        invalid_check = await db.fetch_val(
+        invalid_check = await dbResp.fetch_val(
             """
                 SELECT * FROM VALIDWORD WHERE NOT EXISTS(SELECT word_id FROM VALIDWORD WHERE valid_word = :guess)
             """, 
@@ -161,7 +160,7 @@ async def make_guess():
         abort(500, e)
     #obtain number of guesses left
     try:
-        gueses_left = await db.fetch_val(
+        gueses_left = await dbResp.fetch_val(
             """
                 SELECT guess_cnt FROM USERGAMEDATA WHERE game_id = :game_id
             """,
@@ -171,7 +170,7 @@ async def make_guess():
         abort(500, e)
     #determine if the game is an active game
     try:
-        completed_game = await db.fetch_val(
+        completed_game = await dbResp.fetch_val(
             """
             SELECT game_sts FROM USERGAMEDATA WHERE game_id = :game_id
             """,
@@ -181,7 +180,7 @@ async def make_guess():
         abort(500, e)    
     #obtain secret word
     try:
-        secret_word = await db.fetch_val(
+        secret_word = await dbResp.fetch_val(
             """
             SELECT secret_word FROM USERGAMEDATA WHERE game_id = :game_id
             """,
@@ -290,11 +289,11 @@ async def make_guess():
 @app.route("/games/", methods=["GET"])
 async def all_games():
     #connect to db
-    db = await _get_db()
+    dbResp = await _get_db(random.choice(connection_path)) 
     data =  request.authorization
     user_name = {"user_name": data['username']}
     #select all active games for a single user
-    game = await db.fetch_all(
+    game = await dbResp.fetch_all(
         """
             select game_id from USERGAMEDATA where user_name = :user_name AND game_sts = FALSE
         """, user_name, 

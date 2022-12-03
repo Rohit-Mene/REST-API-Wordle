@@ -30,7 +30,6 @@ async def postScore():
 
     average = t_score / t_games
     r.zadd("leaderboard", {user_name: float(average)})
-    rank = r.zrange("leaderboard",0,2) 
     return "success", 200
 
 
