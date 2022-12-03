@@ -9,16 +9,23 @@
 ## Setup
 ### 1) Copy nginxconfig to /etc/nginx/sites-enabled:<br />
        sudo cp nginxconfig /etc/nginx/site-enabled
-    
-### 2) Run init script:<br />
-       bin/init.sh
-    
+       
+### 2) Run the directory creation shell file from path   REST-API-Wordle/bin :<br />
+       sh dircreation.sh
+
 ### 3) Ensure litefs has proper permissions<br />
       chmod 777 litefs
 
 ## Operation
-### 1) Run foreman:<br />
-      foreman start
+
+### 4) Run foreman:<br />
+       foreman start
+      
+### 5) Run init script from the path REST-API-Wordle/ :<br />
+       bin/init.sh
+
+
+
 
 ## Troubleshooting
 ```
@@ -185,7 +192,7 @@ API DOCUMENTATION-
                 guess_rem represents the number of guesses remaining.
 
     7) Leaderboard API for posting the results of a game    
-    http POST http://localhost:5050/leaderboard uname=<str> guesses:=<int: less than 6> win:=<bool>
+    http POST http://localhost:5050/leaderboard/post uname=<str> guesses:=<int: less than 6> win:=<bool>
 
     Note that, as the url is internal, the url is local:5050 rather than tuffix-vm
 
