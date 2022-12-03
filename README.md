@@ -26,6 +26,8 @@ sudo cp nginxconfig /etc/nginx/site-enabled
 bin/init.sh
 chmod 777 litefs
 foreman start
+### Run this command in case of redis failure
+    redis-cli shutdown
 ```
 
 -----------------------
