@@ -192,7 +192,7 @@ API DOCUMENTATION-
                 guess_rem represents the number of guesses remaining.
 
  ###   7) Leaderboard API for posting the results of a game:<br />    
-          http POST http://localhost:5050/leaderboard/post uname=<str> guesses:=<int: less than 6> win:=<bool>
+       http POST http://localhost:5050/leaderboard/post uname=<str> guesses:=<int: less than 6> win:=<bool>
     Sample API - http POST http://localhost:5050/leaderboard/post uname="rohit" guesses:=6 win:=false
                - http POST http://localhost:5050/leaderboard/post uname="rohit" guesses:=6 win:=false   
     Note that, as the url is internal, the url is local:5050 rather than tuffix-vm
