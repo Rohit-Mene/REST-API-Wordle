@@ -9,7 +9,7 @@ QuartSchema(app)
 
 r = redis.Redis(decode_responses=True)
 
-@app.route("/leaderboard", methods=["POST"])
+@app.route("/leaderboard/post", methods=["POST"])
 async def postScore():
 
     user_details = await request.get_json()
