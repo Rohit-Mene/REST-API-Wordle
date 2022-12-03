@@ -5,3 +5,5 @@ leaderboard: hypercorn leaderboard --reload --debug --bind leaderboard.local.gd:
 primary: ./bin/litefs -config ./etc/primary.yml
 secondary1: ./bin/litefs -config ./etc/secondary1.yml
 secondary2: ./bin/litefs -config ./etc/secondary2.yml
+
+redis: redis-server etc/redis.conf

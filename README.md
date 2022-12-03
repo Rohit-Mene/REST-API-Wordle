@@ -1,40 +1,30 @@
+# cpsc449-project-wordle
+## Part 4
 1)Rohit Mene
 2)Debdyuti Das
 3)Apeksha Shah
 4)Nicholas Fonseca
-# cpsc449-project-wordle
 
-# Folder and file creation
-  Create three sets of directories in REST-API-WORDLE/var with the following structure:
-var
-├── primary
-│   ├── data
-│   └── mount
-├── secondary1
-|   ├── data
-|   └── mount
-└── secondary2
-    ├── data
-    └── mount  
-# Nginx & foreman process start
- 1) Find nginx configuration in the file named "nginxconfig" present in project to the path /etc/nginx/sites-enabled
-    Note : Add the nginx configuration in the "default" file present in /etc/nginx/sites-enabled
+# Setup and Operation Guide
+## Setup
+1) Copy nginxconfig to /etc/nginx/sites-enabled:
+    sudo cp nginxconfig /etc/nginx/site-enabled
+2) Run init script:
+    bin/init.sh
+3) Ensure litefs has proper permissions
+    chmod 777 litefs
 
- 2) From the project path start foreman with command -> foreman start 
+## Operation
+1) Run foreman
+    Foreman start
 
-
-# DB Script Excecution Steps -
-   1) GO to path /bin
-   2) Run command sh init.sh
-   3) Go to path /var
-   4) Run command  sqlite3 user.db
-   5) Go to path /var/primary/mount   
-   6) Run command .tables  to check if tables are created
-   7) Run command  sqlite3 game.db
-   8) Run command .tables  to check if tables are created
-
-# Extra step-
-Make sure litefs file has 'Allow executing file as program' permission enabled
+## Easy copy
+```
+sudo cp nginxconfig /etc/nginx/site-enabled
+bin/init.sh
+chmod 777 litefs
+Foreman start
+```
 
 -----------------------
 API DOCUMENTATION-
@@ -195,6 +185,14 @@ API DOCUMENTATION-
                 guess_rem represents the number of guesses remaining.
 
     7) Leaderboard API for posting the results of a game
-    http POST http://localhost:5050/postScore/ post_score:='{"game_id":3,"no_of_guesses":4,"game_status":"win"}'
+    http POST http://localhost:5050/leaderboard/addGame username=<str> guesses:=<int: less than 6> game_status:=<bool>
 
+    Note that, as the url is internal, the url is local:5050 rather than tuffy-vm
+
+    Response will be 200 if accepted, 400 if data is wrong
+
+    8) Leaderboard API for getting top 10
+    http GET http://tuffy-vm/leaderboard
+
+    Response will be 200 with payload {"leaders":<list of top 10>}
 
