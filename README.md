@@ -36,7 +36,7 @@
 -----------------------
 API DOCUMENTATION-
 ### 1) User registration:<br />
-  http POST http://tuffix-vm/registeruser/ user:='{"name":"<name>","pass":"<pass>"}'
+ #### http POST http://tuffix-vm/registeruser/ user:='{"name":"<name>","pass":"<pass>"}'
   where <name> is the username of the new user and <pass> is the password of the new user
 
     Sample Output:
@@ -46,7 +46,7 @@ API DOCUMENTATION-
         }
 
 ### 2) User Login:<br />
-  http --form --auth name:pass --auth-type basic GET http://tuffix-vm/login/
+ #### http --form --auth name:pass --auth-type basic GET http://tuffix-vm/login/
 
   where <name> is the user name of the user trying to login and <pass > is the password of the user trying to login
 
@@ -65,7 +65,7 @@ API DOCUMENTATION-
             }
         
 ### 3) Start a game:<br />
-  http --auth name:pass --auth-type basic POST http://tuffix-vm/startgame/
+ #### http --auth name:pass --auth-type basic POST http://tuffix-vm/startgame/
 
 
       Sample Output:
@@ -74,7 +74,7 @@ API DOCUMENTATION-
           }
 
 ### 4)Retrieve a list of all active games for a player:<br />
-  http --auth name:pass --auth-type basic GET http://tuffix-vm/games/
+ #### http --auth name:pass --auth-type basic GET http://tuffix-vm/games/
 
   Returns dictionary of all active games by a single user with the user name
     Sample Output:
@@ -91,7 +91,7 @@ API DOCUMENTATION-
                 game_id represents a game that is active for the player in question.
 
 ### 5)Get the state of a game:<br />
-  http --auth name:pass --auth-type basic GET http://tuffix-vm/gamestate/ game:='{"game_id":<game_id>}'
+ #### http --auth name:pass --auth-type basic GET http://tuffix-vm/gamestate/ game:='{"game_id":<game_id>}'
 
   where <game_id> is the id number of an existing game
   
@@ -142,7 +142,7 @@ API DOCUMENTATION-
 
 
 ### 6) Make a guess in an active game:<br />
-  http --auth name:pass --auth-type basic PUT http://tuffix-vm/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
+####  http --auth name:pass --auth-type basic PUT http://tuffix-vm/guess/ guess_to_make:='{"game_id":<game_id>,"guess":"<guess>"}'
 
   Use the JSON format after URL to enter input data for this api. Enter the game ID where <game_id> is and enter guess word where <guess> is.
     
@@ -192,7 +192,7 @@ API DOCUMENTATION-
                 guess_rem represents the number of guesses remaining.
 
  ###   7) Leaderboard API for posting the results of a game:<br />    
-       http POST http://localhost:5050/leaderboard/post uname=<str> guesses:=<int: less than 6> win:=<bool>
+       #### http POST http://localhost:5050/leaderboard/post uname=<str> guesses:=<int: less than 6> win:=<bool>
     Sample API - http POST http://localhost:5050/leaderboard/post uname="rohit" guesses:=6 win:=false
                - http POST http://localhost:5050/leaderboard/post uname="rohit" guesses:=6 win:=false   
     Note that, as the url is internal, the url is local:5050 rather than tuffix-vm
@@ -200,7 +200,7 @@ API DOCUMENTATION-
      Response will be 200 if accepted, 400 if data is wrong
 
  ###   8) Leaderboard API for getting top 10:<br />
-          http GET http://tuffix-vm/leaderboard
+        ####  http GET http://tuffix-vm/leaderboard
 
       Response will be 200 with payload {"leaders":<list of top 10>}
 
