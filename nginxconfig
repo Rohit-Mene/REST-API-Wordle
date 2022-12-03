@@ -39,8 +39,8 @@ server {
                proxy_pass http://backend;
        }
 
-       location /leaderboard/ {
-               proxy_pass http://tuffix-vm/5050:/leaderboard;
+       location /leaderboard {
+               proxy_pass http://localhost:5050/leaderboard;
        }
 }
 
