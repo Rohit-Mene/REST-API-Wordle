@@ -7,6 +7,6 @@ exec: "hypercorn game --reload --debug --bind game.local.gd:$PORT --access-logfi
 static:
   primary: true
 
-  hostname: "tuffix-vm"
+  hostname: "mirdiland"
 
-  advertise-url: "http://tuffix-vm:20202/"
+  advertise-url: "http://mirdiland:20202/"

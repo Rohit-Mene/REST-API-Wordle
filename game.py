@@ -5,6 +5,8 @@ import databases
 from quart_schema import QuartSchema
 import uuid
 import random
+from rq import Queue
+from redis import Redis
 
 app = Quart(__name__)
 QuartSchema(app)
@@ -134,6 +136,8 @@ async def make_guess():
     dbResp = await _get_db(random.choice(connection_path)) 
     #retrieve json
     data = await request.get_json()
+    #open a queue to put win/loss
+    q = Queue(connection=Redis())
     #store game id input
     guess_id={'game_id': data.get('guess_to_make').get('game_id')}
     #store word guessed
@@ -208,7 +212,8 @@ async def make_guess():
                 )
             except sqlite3.IntegrityError as e:
                 abort(500, e)
-            #if correct return 
+            #if correct return
+            #q.enqueue() 
             return {"correct_word": "TRUE"},201
         #if guess is not correct but valid 
         elif valid_check and completed_game == False and gueses_left > 1:
@@ -304,7 +309,24 @@ async def all_games():
     else:
         abort(404)
 
-
+@app.route("/client-register/", methods=["POST"])
+async def client():
+    #connect to db
+    db = await _get_db("primary")
+    data =  request.authorization
+    client_id = uuid.uuid1().hex
+    url = await request.get_json()
+    try:
+        insert_tuple = {'client_id':client_id, 'url' :data.get('url').get('url')}
+        await db.execute(
+            """ 
+                INSERT INTO CLIENT(client_id, url) VALUES(:client_id, :url)                        
+            """,insert_tuple,
+        )
+    except sqlite3.IntegrityError as e:
+        abort(500, e)    
+    return(200)
+        
 @app.errorhandler(404)
 def not_found(e):
     return {"error": "The resource could not be found"}, 404

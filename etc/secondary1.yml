@@ -10,6 +10,6 @@ http:
 static:
   primary: false
 
-  hostname: "tuffix-vm"
+  hostname: "mirdiland"
 
-  advertise-url: "http://tuffix-vm:20202/"
+  advertise-url: "http://mirdiland:20202/"
