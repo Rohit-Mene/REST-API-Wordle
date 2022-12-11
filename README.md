@@ -1,9 +1,9 @@
 # cpsc449-project-wordle
 ## Part 4
 1)Rohit Mene
-2)Debdyuti Das
-3)Nicholas Fonseca
-4)Apeksha Shah
+2)Sean Mccarthy
+3)Gage Giovanni
+4)Steven Rico
 
 
 # Setup and Operation Guide
@@ -199,9 +199,9 @@ API DOCUMENTATION-
 
  ###   7) Leaderboard API for posting the results of a game:<br />    
  #### http POST http://localhost:5500/leaderboard/post uname=<str> guesses:=<int: less than 6> win:=<bool>
-    Sample API - http POST http://localhost:5050/leaderboard/post uname="rohit" guesses:=6 win:=false
-               - http POST http://localhost:5050/leaderboard/post uname="r" guesses:=1 win:=true   
-    Note that, as the url is internal, the url is local:5050 rather than tuffix-vm
+    Sample API - http POST http://localhost:5500/leaderboard/post uname="rohit" guesses:=6 win:=false
+               - http POST http://localhost:5500/leaderboard/post uname="r" guesses:=1 win:=true   
+    Note that, as the url is internal, the url is local:5500 rather than tuffix-vm
 
      Response will be 200 if accepted, 400 if data is wrong
 
