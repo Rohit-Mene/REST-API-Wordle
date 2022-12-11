@@ -12,3 +12,5 @@ UNIQUE(user_name)
 );
 CREATE INDEX USERDATA_idx_861e4408 ON USERDATA(user_name, user_pass);
 COMMIT;
+
+INSERT INTO USERDATA(user_name, user_pass) VALUES('client','admin');

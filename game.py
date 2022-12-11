@@ -313,20 +313,33 @@ async def all_games():
 async def client():
     #connect to db
     db = await _get_db("primary")
-    data =  request.authorization
+    dbResp = await _get_db(random.choice(connection_path)) 
+    #data =  request.authorization
     client_id = uuid.uuid1().hex
     url = await request.get_json()
     try:
-        insert_tuple = {'client_id':client_id, 'url' :data.get('url').get('url')}
-        await db.execute(
-            """ 
-                INSERT INTO CLIENT(client_id, url) VALUES(:client_id, :url)                        
-            """,insert_tuple,
+        client = await dbResp.fetch_val(
+            """
+            SELECT client_id FROM CLIENT WHERE url = :url
+            """,url,
         )
+        if client:
+            return{"Registered": True, "New" : False}, 204
+        else:
+            try:
+                insert_tuple = {'client_id':client_id, 'url' :url.get('url')}
+                await db.execute(
+                    """ 
+                        INSERT INTO CLIENT(client_id, url) VALUES(:client_id, :url)                        
+                    """,insert_tuple,
+                )
+            except sqlite3.IntegrityError as e:
+                abort(500, e)    
+            return{"Registered": True, "New" : True}, 200
     except sqlite3.IntegrityError as e:
-        abort(500, e)    
-    return(200)
-        
+        abort(501, e)  
+       
+            
 @app.errorhandler(404)
 def not_found(e):
     return {"error": "The resource could not be found"}, 404

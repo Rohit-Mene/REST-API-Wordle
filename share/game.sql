@@ -12,7 +12,7 @@ game_sts boolean not null check(game_sts IN(0,1)) DEFAULT 0,
 secret_word TEXT
 );
 
-DROP TABLE IF EXISTS CLIENT:
+DROP TABLE IF EXISTS CLIENT;
 CREATE TABLE CLIENT(
 client_id TEXT PRIMARY KEY,
 url TEXT
