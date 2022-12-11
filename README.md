@@ -204,4 +204,3 @@ API DOCUMENTATION-
 ####  http GET http://tuffix-vm/leaderboard
 
       Response will be 200 with payload {"leaders":<list of top 10>}
-
