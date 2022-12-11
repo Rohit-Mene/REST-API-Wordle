@@ -3,11 +3,35 @@ from quart_schema import QuartSchema
 import redis
 import math
 import json
+import httpx
+import socket
+import os
+import time
 
 app = Quart(__name__)
 QuartSchema(app)
 
 r = redis.Redis(decode_responses=True)
+
+domain = socket.getfqdn()
+port = os.environ['PORT']
+url = 'http://localhost:' + port + '/leaderboard/post'
+print(url)
+
+data={'url':url}
+
+count = 1
+
+def retry():
+    try:
+        time.sleep(10)
+        response = httpx.post('http://tuffix-vm/client-register/',auth=('client','admin'), json=data)
+        print(response)
+        print(count)
+        count + 1 
+    except:
+        retry()
+retry()        
 
 @app.route("/leaderboard/post", methods=["POST"])
 async def postScore():

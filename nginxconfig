@@ -23,6 +23,11 @@ server {
                auth_request /auth;
                proxy_pass http://backend;
        }
+       
+       location /client-register/ {
+               auth_request /auth;
+               proxy_pass http://backend;
+       }
 
        location /gamestate/ {
                auth_request /auth;
@@ -40,12 +45,12 @@ server {
        }
 
        location /leaderboard {
-               proxy_pass http://localhost:5050/leaderboard;
+               proxy_pass http://localhost:5500/leaderboard;
        }
 }
 
 upstream backend {
+ server localhost:5100;
  server localhost:5200;
  server localhost:5300;
- server localhost:5400;
 }
