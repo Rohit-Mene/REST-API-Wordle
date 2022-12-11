@@ -7,6 +7,8 @@ import uuid
 import random
 from rq import Queue
 from redis import Redis
+import urllib.request, json
+import requests
 
 app = Quart(__name__)
 QuartSchema(app)
@@ -33,6 +35,10 @@ async def close_connection(exception):
 class Guess:
     game_id: int
     guess: str
+
+def send_leaderboard_data(username, guesses, win):
+    url = 'http://localhost:5500/leaderboard/post'
+    response = requests.post(url, json={"uname":username, "guesses":guesses, "win":win})
 
 #API for starting a new game
 @app.route("/startgame/",methods=["POST"])
@@ -181,7 +187,17 @@ async def make_guess():
             guess_id,
         )
     except sqlite3.IntegrityError as e:
-        abort(500, e)    
+        abort(500, e)
+    #obtain the username of the guesser
+    try:
+        username = await dbResp.fetch_val(
+            """
+            SELECT user_name FROM USERGAMEDATA WHERE game_id = :game_id
+            """,
+            guess_id,
+        )
+    except sqlite3.IntegrityError as e:
+        abort(500, e) 
     #obtain secret word
     try:
         secret_word = await dbResp.fetch_val(
@@ -212,8 +228,8 @@ async def make_guess():
                 )
             except sqlite3.IntegrityError as e:
                 abort(500, e)
-            #if correct return
-            #q.enqueue() 
+            #queue leaderboard report
+            q.enqueue(send_leaderboard_data, username, 7 - gueses_left, True)
             return {"correct_word": "TRUE"},201
         #if guess is not correct but valid 
         elif valid_check and completed_game == False and gueses_left > 1:
@@ -282,7 +298,9 @@ async def make_guess():
                     """,insert_tuple,
                 )
             except sqlite3.IntegrityError as e:
-                abort(500, e)    
+                abort(500, e)
+                        #queue leaderboard report
+            q.enqueue(send_leaderboard_data, username, 7 - gueses_left, False)   
             return {"guess_rem" : "0","game_sts": "TRUE"},201
         #if the word guessed is invalid let the user know it is not valid and they must guess again
         elif invalid_check:

@@ -43,7 +43,7 @@ async def postScore():
         guesses = user_details["guesses"]
         win = user_details["win"]
     except TypeError:
-        return {msg:"Error: data improperly formed"}, 400
+        return {"msg":"Error: data improperly formed"}, 400
 
     game_score = win * (7 - guesses)
 
