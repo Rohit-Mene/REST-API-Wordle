@@ -13,17 +13,20 @@
        
 ### 2) Run the directory creation shell file from path   REST-API-Wordle/bin :<br />
        sh dircreation.sh
-       ./inituser.sh 
-### 3) Ensure litefs has proper permissions<br />
+### 3) Run init script from the path REST-API-Wordle/ :<br />
+       bin/inituser.sh
+      
+### 4) Ensure litefs has proper permissions<br />
       chmod 777 litefs
       chmod 777 inituser.sh (if needed)
+     
 
 ## Operation
 
-### 4) Run foreman:<br />
+### 5) Run foreman:<br />
        foreman start
       
-### 5) Run init script from the path REST-API-Wordle/ :<br />
+### 6) Run init script from the path REST-API-Wordle/ :<br />
        bin/init.sh
 
 
