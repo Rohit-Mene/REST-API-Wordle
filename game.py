@@ -36,8 +36,7 @@ class Guess:
     game_id: int
     guess: str
 
-def send_leaderboard_data(username, guesses, win):
-    url = 'http://localhost:5500/leaderboard/post'
+async def send_leaderboard_data(url, username, guesses, win):
     response = requests.post(url, json={"uname":username, "guesses":guesses, "win":win})
 
 #API for starting a new game
@@ -229,7 +228,8 @@ async def make_guess():
             except sqlite3.IntegrityError as e:
                 abort(500, e)
             #queue leaderboard report
-            q.enqueue(send_leaderboard_data, username, 7 - gueses_left, True)
+            url = await dbResp.fetch_one("select url from CLIENT")
+            q.enqueue(send_leaderboard_data, url[0], username, 7 - gueses_left, True)
             return {"correct_word": "TRUE"},201
         #if guess is not correct but valid 
         elif valid_check and completed_game == False and gueses_left > 1:
@@ -299,8 +299,9 @@ async def make_guess():
                 )
             except sqlite3.IntegrityError as e:
                 abort(500, e)
-                        #queue leaderboard report
-            q.enqueue(send_leaderboard_data, username, 7 - gueses_left, False)   
+            #queue leaderboard report
+            url = await dbResp.fetch_one("select url from CLIENT")
+            q.enqueue(send_leaderboard_data, url[0], username, 7 - gueses_left, False) 
             return {"guess_rem" : "0","game_sts": "TRUE"},201
         #if the word guessed is invalid let the user know it is not valid and they must guess again
         elif invalid_check:
