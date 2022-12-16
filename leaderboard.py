@@ -27,7 +27,7 @@ loop = asyncio.get_event_loop()
 async def retry():
     while True:
         try:
-            response = httpx.post('http://mirdiland/client-register/',auth=('client','admin'), json=data)
+            response = httpx.post('http://tuffix-vm/client-register/',auth=('client','admin'), json=data)
             #print(response)
             response.raise_for_status()
             await asyncio.sleep(10)
