@@ -12,11 +12,11 @@
        sudo cp nginxconfig /etc/nginx/sites-enabled
 ### 2) Create the cron job
         find the relative path to your working directory
-        in the main directory for the project type sudo crontab -e
-        */10 * * * * (absolute path)
-        control o
-        enter
-        control x      
+        in the main directory for the project type 
+      ##  sudo crontab -e
+      ### */10 * * * * (absolute path)
+    Example -> */10 * * * *  /home/spmccarthy4/cpsc449/project_1/cpsc449-project-wordle/bin/cronjob.sh
+      Save the File
 ### 2) Run the directory creation shell file from path   REST-API-Wordle/bin :<br />
        sh dircreation.sh
 ### 3) Run init script from the path REST-API-Wordle/ :<br />
