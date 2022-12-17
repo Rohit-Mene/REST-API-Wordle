@@ -7,3 +7,4 @@ secondary2: ./bin/litefs -config ./etc/secondary2.yml
 redis: redis-server etc/redis.conf
 
 leaderboard: hypercorn leaderboard --reload --debug --bind leaderboard.local.gd:$PORT --access-logfile - --error-logfile - --log-level DEBUG
+worker: rq worker --with-scheduler
