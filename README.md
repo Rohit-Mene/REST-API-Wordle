@@ -44,8 +44,6 @@ Run the command:<br /> sudo crontab -e
     redis-cli shutdown
 ```
 
-# Start the Server 
-   $foreman start
 
 -----------------------
 
