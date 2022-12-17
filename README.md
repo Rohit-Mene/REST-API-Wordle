@@ -11,7 +11,7 @@
 ### 1) Copy nginxconfig to /etc/nginx/sites-enabled from path REST-API-Wordle/:<br />
        sudo cp nginxconfig /etc/nginx/sites-enabled
 ### 2) Create the cron job:<br />
-Find the relative path to your working directory in the main directory for the project type.<br />
+Find the absolute path to cronjob.sh in the project directory within the bin folder.<br />
 Run the command:<br /> sudo crontab -e
       
   */10 * * * * (absolute path)<br />
@@ -34,6 +34,10 @@ Run the command:<br /> sudo crontab -e
       
 ### 6) Run init script from the path REST-API-Wordle/ :<br />
        bin/init.sh
+
+### 7) Restart foreman to ensure client is registered 6/ :<br />
+       Control+C
+       foreman start
 
 
 
