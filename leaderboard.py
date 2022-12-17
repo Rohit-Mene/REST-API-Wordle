@@ -21,18 +21,17 @@ print(url)
 
 data={'url':url}
 
-count = 1
-loop = asyncio.get_event_loop()
-
 async def retry():
     while True:
         try:
             response = httpx.post('http://tuffix-vm/client-register/',auth=('client','admin'), json=data)
-            #print(response)
+            print(response)
             response.raise_for_status()
             await asyncio.sleep(10)
         except httpx.HTTPStatusError as e:
-            loop.call_later(100, retry)
+            await asyncio.sleep(10)
+            loop.call_later(0, retry)
+            
 
 def stop():
     task.cancel()
