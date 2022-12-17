@@ -7,6 +7,7 @@ import httpx
 import socket
 import os
 import time
+import asyncio
 
 app = Quart(__name__)
 QuartSchema(app)
@@ -20,18 +21,29 @@ print(url)
 
 data={'url':url}
 
-count = 1
+async def retry():
+    while True:
+        try:
+            response = httpx.post('http://tuffix-vm/client-register/',auth=('client','admin'), json=data)
+            print(response)
+            response.raise_for_status()
+            await asyncio.sleep(10)
+        except httpx.HTTPStatusError as e:
+            await asyncio.sleep(10)
+            loop.call_later(0, retry)
+            
 
-def retry():
-    try:
-        time.sleep(10)
-        response = httpx.post('http://tuffix-vm/client-register/',auth=('client','admin'), json=data)
-        print(response)
-        print(count)
-        count + 1 
-    except:
-        retry()
-retry()        
+def stop():
+    task.cancel()
+
+loop = asyncio.get_event_loop()
+loop.call_later(10, stop)
+task = loop.create_task(retry())
+
+try:
+    loop.run_until_complete(task)
+except asyncio.CancelledError:
+    pass
 
 @app.route("/leaderboard/post", methods=["POST"])
 async def postScore():
