@@ -1,11 +1,3 @@
-# cpsc449-project-wordle
-## Part 4
-1)Rohit Mene
-2)Sean Mccarthy
-3)Gage Giovanni
-4)Steven Rico
-
-
 # Setup and Operation Guide
 ## Setup
 ### 1) Copy nginxconfig to /etc/nginx/sites-enabled from path REST-API-Wordle/:<br />
